@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'loadingscreen'
+name 'qb-loading'
 author 'Jamie'
 version '1.0.0'
 description 'qblib-themed loading screen'
