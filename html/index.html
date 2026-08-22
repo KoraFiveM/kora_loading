@@ -4,7 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Loading</title>
-  <link rel="stylesheet" href="style.css" />
+  <!-- Cache-busting query strings: FiveM's NUI browser (CEF) can serve a
+       stale cached copy of these files across reconnects/restarts,
+       independent of the server-side resource actually updating -- bump
+       this value on every change to html/app.js or html/style.css. -->
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
   <main class="screen">
@@ -24,6 +28,6 @@
       <div id="progress-fill" class="progress-fill"></div>
     </div>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
