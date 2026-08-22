@@ -2,20 +2,14 @@
   --background: 0 0% 6.3%;
   --foreground: 0 0% 96.1%;
 
-  --card: 0 0% 9%;
-  --card-foreground: 0 0% 96.1%;
-
   --muted-foreground: 0 0% 58%;
+  --secondary-text: 0 0% 78%;
 
   --primary: 348 83.3% 47.1%;
   --primary-foreground: 0 0% 100%;
 
-  --border: 0 0% 20.4%;
   --surface-raised: 0 0% 14.1%;
-
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-full: 9999px;
+  --border: 0 0% 20.4%;
 }
 
 * {
@@ -28,73 +22,162 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  background: hsl(var(--background));
 }
 
 body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  color: hsl(var(--foreground));
 }
 
 .screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(1400px 900px at 50% 120%, hsl(var(--primary) / 0.10), transparent 60%),
+    linear-gradient(160deg, #131313 0%, hsl(var(--background)) 55%, #090909 100%);
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 32px 40px;
-  min-width: 320px;
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-xl);
-  box-shadow: 0 24px 64px rgb(0 0 0 / 55%);
+/* Slow-drifting glows -- depth and motion without anything flashy or
+   coloured beyond the single configured brand accent. */
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(10px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.glow-a {
+  width: 900px;
+  height: 900px;
+  left: -300px;
+  top: -350px;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.16), transparent 65%);
+  animation: drift-a 26s ease-in-out infinite;
+}
+
+.glow-b {
+  width: 700px;
+  height: 700px;
+  right: -250px;
+  bottom: -300px;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.10), transparent 65%);
+  animation: drift-b 32s ease-in-out infinite;
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(60px, 40px); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-50px, -30px); }
+}
+
+/* Faint diagonal grain so large flat surfaces don't look inert -- opacity
+   is deliberately subtle, this is texture, not a pattern to notice. */
+.grain {
+  position: absolute;
+  inset: -20%;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgb(255 255 255 / 2.2%) 0px,
+    rgb(255 255 255 / 2.2%) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  left: 64px;
+  bottom: 108px;
+  max-width: 640px;
+}
+
+.kicker {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 10px;
 }
 
 .server-name {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 24px;
-  text-align: center;
-  color: hsl(var(--foreground));
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
-.spinner {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  border: 3px solid hsl(var(--surface-raised));
-  border-top-color: hsl(var(--primary));
-  animation: spin 900ms linear infinite;
+.rail {
+  display: inline-block;
+  width: 4px;
+  height: 34px;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 18px hsl(var(--primary) / 0.55);
+  flex-shrink: 0;
 }
 
-.status-line {
-  margin: 0;
-  font-size: 12px;
-  line-height: 18px;
-  color: hsl(var(--muted-foreground));
+.tip {
+  margin: 18px 0 0;
+  font-size: 14px;
+  color: hsl(var(--secondary-text));
+  min-height: 20px;
+  opacity: 1;
+  transition: opacity 400ms ease;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.tip.fading {
+  opacity: 0;
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: hsl(var(--surface-raised));
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  animation: sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0% { left: -40%; }
+  100% { left: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
+  .glow-a,
+  .glow-b,
+  .progress-fill {
     animation: none;
+  }
+  .progress-fill {
+    left: 0;
+    width: 100%;
+    opacity: 0.6;
   }
 }

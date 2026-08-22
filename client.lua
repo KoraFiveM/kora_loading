@@ -8,7 +8,7 @@
 -- Pull-on-mount path: the page fetches this once as soon as its JS runs, so
 -- it doesn't have to race the push message below to get the right colours.
 RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
-    cb({ serverName = Config.serverName, tokens = QB.theme.tokens() })
+    cb({ serverName = Config.serverName, tips = Config.tips, tokens = QB.theme.tokens() })
 end)
 
 -- Live-push path: covers a theme change without a full loading-screen reload

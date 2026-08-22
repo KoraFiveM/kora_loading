@@ -8,10 +8,20 @@
 </head>
 <body>
   <main class="screen">
-    <div class="card">
-      <h1 id="server-name" class="server-name">Roleplay Server Name</h1>
-      <div class="spinner" role="status" aria-label="Loading"></div>
-      <p id="status-line" class="status-line">Loading...</p>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="grain"></div>
+
+    <div class="content">
+      <span class="kicker">LOADING</span>
+      <h1 id="server-name" class="server-name">
+        <span class="rail"></span>Roleplay Server Name
+      </h1>
+      <p id="tip" class="tip"></p>
+    </div>
+
+    <div class="progress">
+      <div id="progress-fill" class="progress-fill"></div>
     </div>
   </main>
   <script src="app.js"></script>
