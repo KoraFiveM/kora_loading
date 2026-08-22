@@ -1,5 +1,5 @@
 (function () {
-  const resourceName = window.GetParentResourceName ? window.GetParentResourceName() : "loadingscreen";
+  const resourceName = window.GetParentResourceName ? window.GetParentResourceName() : "qbloading";
 
   const serverNameEl = document.getElementById("server-name");
   const tipEl = document.getElementById("tip");
