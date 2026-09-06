@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cfx-nui-qbtheme/theme.css" />
+  <script src="https://cfx-nui-qbtheme/theme.js?v=2" defer></script>
   <title>Loading</title>
   <!-- Cache-busting query strings: FiveM's NUI browser (CEF) can serve a
        stale cached copy of these files across reconnects/restarts,
        independent of the server-side resource actually updating -- bump
        this value on every change to html/app.js or html/style.css. -->
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
   <main class="screen">
@@ -28,6 +30,20 @@
       <div id="progress-fill" class="progress-fill"></div>
     </div>
   </main>
-  <script src="app.js?v=2"></script>
+  <script>
+    (() => {
+      const root = document.querySelector(".screen");
+      const resize = () => {
+        const scale = Math.min(2, Math.max(1, Math.min(window.innerWidth / 2560, window.innerHeight / 1440)));
+        root.style.width = `${window.innerWidth / scale}px`;
+        root.style.height = `${window.innerHeight / scale}px`;
+        root.style.transform = `scale(${scale})`;
+        root.style.transformOrigin = "top left";
+      };
+      resize();
+      window.addEventListener("resize", resize);
+    })();
+  </script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

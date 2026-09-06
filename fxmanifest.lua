@@ -6,8 +6,9 @@ use_experimental_fxv2_oal 'yes'
 name 'qbloading'
 author 'Jamie'
 version '1.0.0'
-description 'qblib-themed loading screen'
+description 'qbtheme-styled loading screen'
 
+dependency 'qbtheme'
 dependency 'qblib'
 
 loadscreen 'html/index.html'
@@ -19,9 +20,12 @@ files {
     'html/app.js',
 }
 
--- Required to reach QB.theme/QB.nui -- see qblib's own AGENTS.md for why this
+-- Required to reach shared qblib APIs -- see qblib's own AGENTS.md for why this
 -- is how a consumer resource pulls in the QB proxy (init.lua).
 shared_script '@qblib/init.lua'
 
 shared_scripts { 'config.lua' }
-client_script 'client.lua'
+client_scripts {
+    '@qbtheme/client/bridge.lua',
+    'client.lua',
+}

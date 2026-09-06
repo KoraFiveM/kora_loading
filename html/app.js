@@ -8,14 +8,6 @@
   let tipIndex = 0;
   let tipTimer = null;
 
-  function applyTokens(tokens) {
-    if (!tokens) return;
-    const root = document.documentElement.style;
-    for (const [key, value] of Object.entries(tokens)) {
-      root.setProperty(`--${key}`, value);
-    }
-  }
-
   function applyServerName(name) {
     if (!name) return;
     // Keep the accent rail element, just swap the trailing text node.
@@ -62,24 +54,7 @@
   fetchNui("loadingscreen:getTheme").then((result) => {
     if (!result) return;
     applyServerName(result.serverName);
-    applyTokens(result.tokens);
     startTips(result.tips);
-  });
-
-  window.addEventListener("message", (event) => {
-    // FiveM posts SendNUIMessage from the game's own NUI window, which
-    // arrives here with origin "nui://game" (verified in-game -- see
-    // qblib/web/src/lib/useNuiEvent.ts for the same finding). Anything else
-    // (e.g. another page's script probing this frame) arrives with a
-    // different origin, so this is a cheap defense-in-depth check -- NOT an
-    // event.source check, which would wrongly reject the real game messages
-    // too (see that same file for why).
-    if (event.origin !== "nui://game") return;
-
-    const { action, data } = event.data || {};
-    if (action === "loadingscreen:theme") {
-      applyTokens(data);
-    }
   });
 
   window.addEventListener("beforeunload", () => {

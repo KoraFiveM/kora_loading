@@ -3,7 +3,7 @@ layout: default
 title: qbloading
 ---
 
-A `loadscreen` resource for FiveM, styled with qblib's shared theme tokens so
+A `loadscreen` resource for FiveM, styled with qbtheme's shared tokens so
 it matches the rest of the qbcore2 UI out of the box. It sets
 `loadscreen_manual_shutdown 'yes'`, so the screen stays up until something
 explicitly dismisses it — letting other resources (character selection,
@@ -11,12 +11,14 @@ asset streaming, etc.) finish before the player is dropped into the world.
 
 ## Requirements
 
+- `qbtheme`
 - [qblib](https://qbcore2.github.io/qblib/)
 
 ## Installation
 
 `server.cfg`, in this order:
 ```
+ensure qbtheme
 ensure qblib
 ensure qbloading
 ```
@@ -54,26 +56,22 @@ callback, then cycles tips every 6 seconds.
 
 ### Matching your server's brand colour
 
-The screen doesn't have its own colour config — it pulls `QB.theme.tokens()`
-from qblib, which derives every CSS custom property (`--primary`,
-`--background`, `--border`, ...) from qblib's own
-[`Config.ui.accentColor`](https://qbcore2.github.io/qblib/). Set that once in
-qblib and qbloading (and every other qblib-themed NUI) picks it up
-automatically:
+The screen doesn't have its own colour config. It loads `theme.css` and
+`theme.js` from qbtheme, then fetches the complete runtime token map through
+the imported bridge. Set the palette once and every qbtheme consumer picks it
+up automatically:
 ```lua
--- qblib/config.lua
-Config.ui.accentColor = '#1E90FF'
+-- qbtheme/config.lua
+QBThemeConfig.colors.primary = '#1E90FF'
 ```
-A theme change is pushed live via `SendNUIMessage({ action =
-'loadingscreen:theme', data = ... })` on resource start, so a restart of
-qbloading reflects a new accent colour without editing this resource at all.
+Restarting qbtheme pushes new tokens into running consumers while retaining
+any resource-specific overrides.
 
 ## Customization
 
 - **Server name / tips** — `Config.serverName` and `Config.tips` in
   `config.lua`.
-- **Accent colour and other theme tokens** — set via qblib's
-  `Config.ui.accentColor`, not local config (see above).
+- **Accent colour and other theme tokens** — set in `qbtheme/config.lua`.
 - **Layout/markup** — `html/index.html`, `html/style.css`, `html/app.js`.
   Bump the `?v=` query string on `style.css`/`app.js` when editing either, to
   bust FiveM's NUI (CEF) cache across reconnects.
