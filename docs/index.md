@@ -57,15 +57,14 @@ callback, then cycles tips every 6 seconds.
 ### Matching your server's brand colour
 
 The screen doesn't have its own colour config. It loads `theme.css` and
-`theme.js` from qbtheme; the browser reads `qbtheme/theme.json` directly before
-the loading resource's client bridge is available. Set the palette once and every qbtheme consumer picks it
-up automatically:
+`theme.js` from qbtheme, and the browser reads `qbtheme/theme.json` directly.
+Set the palette once and every qbtheme consumer picks it up automatically:
 ```lua
 -- qbtheme/theme.json
 QBThemeConfig.colors.primary = '#1E90FF'
 ```
-Restarting qbtheme pushes new tokens into running consumers while retaining
-any resource-specific overrides.
+The loading page receives the current palette when it mounts; it does not keep
+a Lua theme bridge alive after the loading frame shuts down.
 
 ## Customization
 

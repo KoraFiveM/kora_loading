@@ -2,10 +2,10 @@
 -- from qblib's shared frame -- QB.nui.send/registerCallback would dispatch
 -- into qblib's own resource VM (via the cross-resource export call) and so
 -- target QBLIB's frame, not this one. Talk to this resource's own frame with
--- raw natives; qbtheme's imported bridge separately owns token delivery.
+-- raw natives. The page loads qbtheme's CSS and browser loader directly, so no
+-- Lua theme bridge should outlive the loading frame and send into a closed UI.
 
--- Pull-on-mount path for loading-screen content. Theme tokens use qbtheme's
--- separate qbtheme:ready callback from the imported bridge.
+-- Pull-on-mount path for loading-screen content.
 RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
     cb({ serverName = Config.serverName, tips = Config.tips })
 end)

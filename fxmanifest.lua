@@ -26,6 +26,5 @@ shared_script '@qblib/init.lua'
 
 shared_scripts { 'config.lua' }
 client_scripts {
-    '@qbtheme/client/bridge.lua',
     'client.lua',
 }
