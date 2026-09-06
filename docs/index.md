@@ -57,11 +57,11 @@ callback, then cycles tips every 6 seconds.
 ### Matching your server's brand colour
 
 The screen doesn't have its own colour config. It loads `theme.css` and
-`theme.js` from qbtheme, then fetches the complete runtime token map through
-the imported bridge. Set the palette once and every qbtheme consumer picks it
+`theme.js` from qbtheme; the browser reads `qbtheme/theme.json` directly before
+the loading resource's client bridge is available. Set the palette once and every qbtheme consumer picks it
 up automatically:
 ```lua
--- qbtheme/config.lua
+-- qbtheme/theme.json
 QBThemeConfig.colors.primary = '#1E90FF'
 ```
 Restarting qbtheme pushes new tokens into running consumers while retaining
@@ -71,7 +71,7 @@ any resource-specific overrides.
 
 - **Server name / tips** — `Config.serverName` and `Config.tips` in
   `config.lua`.
-- **Accent colour and other theme tokens** — set in `qbtheme/config.lua`.
+- **Accent colour and other theme tokens** — set in `qbtheme/theme.json`.
 - **Layout/markup** — `html/index.html`, `html/style.css`, `html/app.js`.
   Bump the `?v=` query string on `style.css`/`app.js` when editing either, to
   bust FiveM's NUI (CEF) cache across reconnects.
