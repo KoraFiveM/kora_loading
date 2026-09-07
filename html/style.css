@@ -149,3 +149,14 @@ body {
     opacity: 0.6;
   }
 }
+
+@media (max-width: 640px) {
+  .glow-a { width: 130vw; height: 130vw; left: -45vw; top: -50vw; }
+  .glow-b { width: 110vw; height: 110vw; right: -40vw; bottom: -45vw; }
+  .content { right: 24px; left: 24px; bottom: 58px; max-width: none; }
+  .kicker { font-size: 10px; letter-spacing: 0.16em; }
+  .server-name { gap: 10px; font-size: clamp(26px, 8vw, 40px); }
+  .rail { width: 3px; height: 1em; }
+  .tip { margin-top: 12px; font-size: 12px; }
+}
+@media (max-height: 500px) { .content { bottom: 32px; }.tip { display: none; }.server-name { font-size: 28px; } }
