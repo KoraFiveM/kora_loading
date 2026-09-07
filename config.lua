@@ -9,3 +9,6 @@ Config.tips = {
     'Tip: robbing a store alerts nearby police.',
     'Tip: buy a house to unlock private storage.',
 }
+
+-- Registers this resource-owned configuration with qblib without changing its public Config table.
+if QB and QB.config and QB.config.adopt then Config = QB.config.adopt(Config) end
