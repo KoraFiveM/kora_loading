@@ -34,7 +34,7 @@ body {
   height: 900px;
   left: -300px;
   top: -350px;
-  background: radial-gradient(circle, hsl(var(--primary) / 0.16), transparent 65%);
+  background: radial-gradient(circle, hsl(var(--primary, 262 83% 58%) / 0.16), transparent 65%);
   animation: drift-a 26s ease-in-out infinite;
 }
 
@@ -43,7 +43,7 @@ body {
   height: 700px;
   right: -250px;
   bottom: -300px;
-  background: radial-gradient(circle, hsl(var(--primary) / 0.10), transparent 65%);
+  background: radial-gradient(circle, hsl(var(--primary, 262 83% 58%) / 0.10), transparent 65%);
   animation: drift-b 32s ease-in-out infinite;
 }
 
@@ -75,7 +75,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.24em;
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--muted-foreground, 215 16% 65%));
   margin-bottom: 10px;
 }
 
@@ -95,15 +95,15 @@ body {
   width: 4px;
   height: 34px;
   border-radius: 999px;
-  background: hsl(var(--primary));
-  box-shadow: 0 0 18px hsl(var(--primary) / 0.55);
+  background: hsl(var(--primary, 262 83% 58%));
+  box-shadow: 0 0 18px hsl(var(--primary, 262 83% 58%) / 0.55);
   flex-shrink: 0;
 }
 
 .tip {
   margin: 18px 0 0;
   font-size: 14px;
-  color: hsl(var(--secondary-text));
+  color: hsl(var(--secondary-text, 210 20% 80%));
   min-height: 20px;
   opacity: 1;
   transition: opacity 400ms ease;
@@ -119,7 +119,7 @@ body {
   right: 0;
   bottom: 0;
   height: 3px;
-  background: hsl(var(--surface-raised));
+  background: hsl(var(--surface-raised, 222 20% 18%));
   overflow: hidden;
 }
 
@@ -128,7 +128,7 @@ body {
   top: 0;
   bottom: 0;
   width: 40%;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  background: linear-gradient(90deg, transparent, hsl(var(--primary, 262 83% 58%)), transparent);
   animation: sweep 1.6s ease-in-out infinite;
 }
 
