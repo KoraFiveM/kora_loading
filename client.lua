@@ -1,8 +1,8 @@
 -- NOTE: this resource has its own NUI frame (the `loadscreen` page), separate
--- from qblib's shared frame -- QB.nui.send/registerCallback would dispatch
--- into qblib's own resource VM (via the cross-resource export call) and so
+-- from kora_lib's shared frame -- QB.nui.send/registerCallback would dispatch
+-- into kora_lib's own resource VM (via the cross-resource export call) and so
 -- target QBLIB's frame, not this one. Talk to this resource's own frame with
--- raw natives. The page loads qbtheme's CSS and browser loader directly, so no
+-- raw natives. The page loads kora_theme's CSS and browser loader directly, so no
 -- Lua theme bridge should outlive the loading frame and send into a closed UI.
 
 -- Pull-on-mount path for loading-screen content.

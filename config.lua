@@ -10,7 +10,7 @@ Config.tips = {
     'Tip: buy a house to unlock private storage.',
 }
 
--- Registers this resource-owned configuration with qblib without changing its public Config table.
+-- Registers this resource-owned configuration with kora_lib without changing its public Config table.
 if QB and QB.config and QB.config.adopt then
     Config.serverName = QB.config.string(Config.serverName, {
         minLength = 1, label = 'Server name',

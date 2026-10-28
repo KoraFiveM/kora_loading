@@ -1,5 +1,5 @@
 (function () {
-  const resourceName = window.GetParentResourceName ? window.GetParentResourceName() : "qbloading";
+  const resourceName = window.GetParentResourceName ? window.GetParentResourceName() : "kora_loading";
 
   const serverNameEl = document.getElementById("server-name");
   const tipEl = document.getElementById("tip");

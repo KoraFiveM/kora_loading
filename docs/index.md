@@ -1,9 +1,9 @@
 ---
 layout: default
-title: qbloading
+title: kora_loading
 ---
 
-A `loadscreen` resource for FiveM, styled with qbtheme's shared tokens so
+A `loadscreen` resource for FiveM, styled with kora_theme's shared tokens so
 it matches the rest of the qbcore2 UI out of the box. It sets
 `loadscreen_manual_shutdown 'yes'`, so the screen stays up until something
 explicitly dismisses it — letting other resources (character selection,
@@ -11,16 +11,16 @@ asset streaming, etc.) finish before the player is dropped into the world.
 
 ## Requirements
 
-- `qbtheme`
-- [qblib](https://qbcore2.github.io/qblib/)
+- `kora_theme`
+- [qblib](https://qbcore2.github.io/kora_lib/)
 
 ## Installation
 
 `server.cfg`, in this order:
 ```
-ensure qbtheme
-ensure qblib
-ensure qbloading
+ensure kora_theme
+ensure kora_lib
+ensure kora_loading
 ```
 
 ## Usage examples
@@ -57,10 +57,10 @@ callback, then cycles tips every 6 seconds.
 ### Matching your server's brand colour
 
 The screen doesn't have its own colour config. It loads `theme.css` and
-`theme.js` from qbtheme, and the browser reads `qbtheme/theme.json` directly.
-Set the palette once and every qbtheme consumer picks it up automatically:
+`theme.js` from kora_theme, and the browser reads `kora_theme/theme.json` directly.
+Set the palette once and every kora_theme consumer picks it up automatically:
 ```lua
--- qbtheme/theme.json
+-- kora_theme/theme.json
 QBThemeConfig.colors.primary = '#1E90FF'
 ```
 The loading page receives the current palette when it mounts; it does not keep
@@ -70,7 +70,7 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 - **Server name / tips** — `Config.serverName` and `Config.tips` in
   `config.lua`.
-- **Accent colour and other theme tokens** — set in `qbtheme/theme.json`.
+- **Accent colour and other theme tokens** — set in `kora_theme/theme.json`.
 - **Layout/markup** — `html/index.html`, `html/style.css`, `html/app.js`.
   Bump the `?v=` query string on `style.css`/`app.js` when editing either, to
   bust FiveM's NUI (CEF) cache across reconnects.
@@ -79,7 +79,7 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 Part of the [qbcore2](https://github.com/qbcore2) resource set:
 
-- [qblib](https://qbcore2.github.io/qblib/) — shared helper library
-- [qbcore](https://qbcore2.github.io/qbcore/) — framework core
-- [qbmultichar](https://qbcore2.github.io/qbmultichar/) — character selection
+- [qblib](https://qbcore2.github.io/kora_lib/) — shared helper library
+- [qbcore](https://qbcore2.github.io/kora_core/) — framework core
+- [qbmultichar](https://qbcore2.github.io/kora_multichar/) — character selection
 - [full resource list ↗](https://github.com/orgs/qbcore2/repositories)
