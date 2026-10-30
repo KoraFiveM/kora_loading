@@ -12,7 +12,7 @@ asset streaming, etc.) finish before the player is dropped into the world.
 ## Requirements
 
 - `kora_theme`
-- [qblib](https://qbcore2.github.io/kora_lib/)
+- [kora_lib](https://qbcore2.github.io/kora_lib/)
 
 ## Installation
 
@@ -79,7 +79,7 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 Part of the [qbcore2](https://github.com/qbcore2) resource set:
 
-- [qblib](https://qbcore2.github.io/kora_lib/) — shared helper library
+- [kora_lib](https://qbcore2.github.io/kora_lib/) — shared helper library
 - [qbcore](https://qbcore2.github.io/kora_core/) — framework core
 - [qbmultichar](https://qbcore2.github.io/kora_multichar/) — character selection
 - [full resource list ↗](https://github.com/orgs/qbcore2/repositories)
