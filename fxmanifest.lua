@@ -23,7 +23,7 @@ files {
 }
 
 -- Required to reach shared kora_lib APIs -- see kora_lib's own AGENTS.md for why this
--- is how a consumer resource pulls in the QB proxy (init.lua).
+-- is how a consumer resource pulls in the Kora proxy (init.lua).
 shared_script '@kora_lib/init.lua'
 
 shared_scripts { 'config.lua' }
