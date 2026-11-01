@@ -58,11 +58,22 @@ callback, then cycles tips every 6 seconds.
 
 The screen doesn't have its own colour config. It loads `theme.css` and
 `theme.js` from kora_theme, and the browser reads `kora_theme/theme.json` directly.
-Set the palette once and every kora_theme consumer picks it up automatically:
-```lua
--- kora_theme/theme.json
-QBThemeConfig.colors.primary = '#1E90FF'
+Colours are set in one place, `kora_theme/theme.json` (not in Lua), then restart
+`kora_theme`. Set the palette once and every kora_theme consumer picks it up
+automatically:
+```json
+{
+  "name": "Kora green",
+  "colors": {
+    "primary": "#1E90FF"
+  }
+}
 ```
+`name` is the label of the primary colour, and `presets` lists the extra colours
+offered by the `/theme` picker. Players can also choose their own accent
+colour in game with `/theme` (stored client-side; `/theme reset` returns to the
+`theme.json` primary). See the kora_theme README for the full key list.
+
 The loading page receives the current palette when it mounts; it does not keep
 a Lua theme bridge alive after the loading frame shuts down.
 
@@ -70,7 +81,8 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 - **Server name / tips** — `Config.serverName` and `Config.tips` in
   `config.lua`.
-- **Accent colour and other theme tokens** — set in `kora_theme/theme.json`.
+- **Accent colour and other theme tokens** — set in `kora_theme/theme.json`;
+  players can override their own accent with `/theme`.
 - **Layout/markup** — `html/index.html`, `html/style.css`, `html/app.js`.
   Bump the `?v=` query string on `style.css`/`app.js` when editing either, to
   bust FiveM's NUI (CEF) cache across reconnects.
