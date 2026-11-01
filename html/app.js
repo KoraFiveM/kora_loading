@@ -48,9 +48,6 @@
       .catch(() => null);
   }
 
-  // Pull-on-mount: gets the current theme/copy immediately rather than
-  // waiting on the live push below, which may have already fired before
-  // this script ran.
   fetchNui("loadingscreen:getTheme").then((result) => {
     if (!result) return;
     applyServerName(result.serverName);
