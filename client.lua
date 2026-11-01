@@ -5,7 +5,6 @@
 -- raw natives. The page loads kora_theme's CSS and browser loader directly, so no
 -- Lua theme bridge should outlive the loading frame and send into a closed UI.
 
--- Pull-on-mount path for loading-screen content.
 RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
     cb({ serverName = Config.serverName, tips = Config.tips })
 end)
