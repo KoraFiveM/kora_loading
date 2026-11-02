@@ -20,6 +20,9 @@ files {
     'html/index.html',
     'html/style.css',
     'html/app.js',
+    'html/kora_theme/theme.js',
+    'html/kora_theme/theme.json',
+    'html/media/*',
 }
 
 -- Required to reach shared kora_lib APIs -- see kora_lib's own AGENTS.md for why this

@@ -4,26 +4,37 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cfx-nui-kora_theme/theme.css" />
+  <!-- A loadscreen is shown before other resources are mounted, so the cfx-nui-kora_theme
+       URLs may not answer yet. kora_theme/theme.js is a synced copy of kora_theme's script
+       and theme.json (see tools/sync-theme.mjs) that applies the same colour tokens from
+       this resource's own files; the live script below re-applies them once reachable. -->
+  <script src="kora_theme/theme.js" defer></script>
   <script src="https://cfx-nui-kora_theme/theme.js?v=3" defer></script>
   <title>Loading</title>
   <!-- Cache-busting query strings: FiveM's NUI browser (CEF) can serve a
        stale cached copy of these files across reconnects/restarts,
        independent of the server-side resource actually updating -- bump
        this value on every change to html/app.js or html/style.css. -->
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <main class="screen">
+    <div id="backdrop" class="backdrop">
+      <div id="slides" class="slides"></div>
+      <video id="bg-video" class="bg-video" muted loop playsinline autoplay></video>
+      <div class="dim"></div>
+    </div>
     <div class="glow glow-a"></div>
     <div class="glow glow-b"></div>
     <div class="grain"></div>
 
     <div class="content">
-      <span class="kicker">LOADING</span>
+      <span class="kicker">LOADING <span id="progress-percent" class="percent">0%</span></span>
       <h1 id="server-name" class="server-name">
         <span class="rail"></span>Roleplay Server Name
       </h1>
       <p id="tip" class="tip"></p>
+      <p id="progress-status" class="status"></p>
     </div>
 
     <div class="progress">
@@ -44,6 +55,6 @@
       window.addEventListener("resize", resize);
     })();
   </script>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

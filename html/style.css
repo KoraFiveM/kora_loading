@@ -19,6 +19,50 @@ body {
   pointer-events: none;
 }
 
+/* Themed backdrop: sits under everything and is the only opaque layer, so the
+   document and .screen stay transparent. Colours come from kora_theme tokens. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 0%, hsl(var(--primary, 0 0% 90%) / 0.14), transparent 60%),
+    linear-gradient(160deg, hsl(var(--card, 0 0% 9%)), hsl(var(--background, 0 0% 6%)) 70%);
+  pointer-events: none;
+}
+
+.backdrop.transparent { background: none; }
+
+.slides,
+.slide,
+.bg-video,
+.dim {
+  position: absolute;
+  inset: 0;
+}
+
+.slide {
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+
+.slide.active { opacity: 1; }
+
+.bg-video {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bg-video.active { display: block; }
+
+.dim {
+  background: hsl(var(--background, 0 0% 6%) / var(--dim, 0.45));
+}
+
 /* Slow-drifting glows -- depth and motion without anything flashy or
    coloured beyond the single configured brand accent. */
 .glow {
@@ -34,7 +78,7 @@ body {
   height: 900px;
   left: -300px;
   top: -350px;
-  background: radial-gradient(circle, hsl(var(--primary, 262 83% 58%) / 0.16), transparent 65%);
+  background: radial-gradient(circle, hsl(var(--primary, 0 0% 90%) / 0.16), transparent 65%);
   animation: drift-a 26s ease-in-out infinite;
 }
 
@@ -43,7 +87,7 @@ body {
   height: 700px;
   right: -250px;
   bottom: -300px;
-  background: radial-gradient(circle, hsl(var(--primary, 262 83% 58%) / 0.10), transparent 65%);
+  background: radial-gradient(circle, hsl(var(--primary, 0 0% 90%) / 0.10), transparent 65%);
   animation: drift-b 32s ease-in-out infinite;
 }
 
@@ -95,8 +139,8 @@ body {
   width: 4px;
   height: 34px;
   border-radius: 999px;
-  background: hsl(var(--primary, 262 83% 58%));
-  box-shadow: 0 0 18px hsl(var(--primary, 262 83% 58%) / 0.55);
+  background: hsl(var(--primary, 0 0% 90%));
+  box-shadow: 0 0 18px hsl(var(--primary, 0 0% 90%) / 0.55);
   flex-shrink: 0;
 }
 
@@ -125,28 +169,40 @@ body {
 
 .progress-fill {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 40%;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary, 262 83% 58%)), transparent);
-  animation: sweep 1.6s ease-in-out infinite;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: hsl(var(--primary, 0 0% 90%));
+  box-shadow: 0 0 12px hsl(var(--primary, 0 0% 90%) / 0.6);
+  transition: transform 500ms ease-out;
 }
 
-@keyframes sweep {
-  0% { left: -40%; }
-  100% { left: 100%; }
+.percent {
+  margin-left: 0.6em;
+  color: hsl(var(--primary, 0 0% 90%));
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  margin: 6px 0 0;
+  min-height: 18px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground, 0 0% 60%));
+}
+
+.no-progress-text .percent,
+.no-progress-text .status {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .glow-a,
-  .glow-b,
-  .progress-fill {
+  .glow-b {
     animation: none;
   }
-  .progress-fill {
-    left: 0;
-    width: 100%;
-    opacity: 0.6;
+  .progress-fill,
+  .slide {
+    transition: none;
   }
 }
 
