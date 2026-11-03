@@ -3,7 +3,7 @@ Config = {}
 Config.serverName = 'Roleplay Server Name'
 
 Config.tips = {
-    'Tip: press F1 to open the phone.',
+    'Tip: press M to open the phone (rebind it in Settings > Key Bindings > FiveM).',
     'Tip: you can holster your weapon to avoid drawing attention.',
     'Tip: type /report in chat if you run into a bug.',
     'Tip: robbing a store alerts nearby police.',
