@@ -11,6 +11,7 @@ RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
         serverName = Config.serverName,
         tips = Config.tips,
         showProgressText = Config.showProgressText,
+        theme = Config.theme,
         media = Config.media,
     })
 end)

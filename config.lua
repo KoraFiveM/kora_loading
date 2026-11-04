@@ -13,6 +13,14 @@ Config.tips = {
 -- Shows the percentage and the current load stage next to the progress bar.
 Config.showProgressText = true
 
+-- How closely the screen follows kora_theme. Colours always come from
+-- kora_theme's theme.json; this only decides whether its font choice is used
+-- too. With fonts = false the screen keeps the plain built-in stack even when
+-- theme.json picks a font.
+Config.theme = {
+    fonts = true,
+}
+
 -- Background media. Every option is optional: with nothing set, a background themed with
 -- the kora_theme colours is shown. A path is relative to this resource's html/ folder
 -- (put your files in html/media/, e.g. 'media/city.jpg') or a full https:// URL.
@@ -39,6 +47,10 @@ if Kora and Kora.config and Kora.config.adopt then
     Config.showProgressText = Kora.config.boolean(Config.showProgressText, {
         label = 'Show progress text',
         description = 'When enabled, the loading percentage and the current load stage are shown above the progress bar. The bar itself is always shown. After restarting this resource, newly opened loading screens use this setting.',
+    })
+    Config.theme.fonts = Kora.config.boolean(Config.theme.fonts, {
+        label = 'Use the theme fonts',
+        description = 'When enabled, the loading screen uses the fonts chosen in kora_theme, so changing the theme font changes this screen too. Disable it to keep the plain built-in font. Colours always follow kora_theme either way.',
     })
     Config.media.backdrop = Kora.config.boolean(Config.media.backdrop, {
         label = 'Themed background',

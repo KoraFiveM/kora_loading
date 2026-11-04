@@ -20,8 +20,10 @@ files {
     'html/index.html',
     'html/style.css',
     'html/app.js',
-    'html/kora_theme/theme.js',
-    'html/kora_theme/theme.json',
+    -- Synced copies of kora_theme's theme.js, theme.json and fonts/ folder, so
+    -- colours and fonts apply before the cfx-nui-kora_theme origin answers.
+    -- Refresh with tools/sync-theme.mjs, never by hand.
+    'html/kora_theme/**',
     'html/media/*',
 }
 

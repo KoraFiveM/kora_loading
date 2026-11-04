@@ -80,17 +80,27 @@ Config.media = {
 Files in `html/media/` are streamed to the loadscreen automatically. Keep them
 small: players see the screen while they are still downloading your server.
 
-### Matching your server's brand colour
+### Matching your server's brand colour and fonts
 
-The screen doesn't have its own colour config. A loadscreen is shown before
-other resources are mounted, so `cfx-nui-kora_theme` may not answer yet. The page
-therefore uses copies of kora_theme's `theme.js` and `theme.json` stored in
-`html/kora_theme/`, and the live kora_theme script re-applies the colours once it
-is reachable. After changing `kora_theme/theme.json`, refresh the copies:
+The screen doesn't have its own colour or font config. A loadscreen is shown
+before other resources are mounted, so `cfx-nui-kora_theme` may not answer yet.
+The page therefore uses copies of kora_theme's `theme.js`, `theme.json` and
+`fonts/` folder stored in `html/kora_theme/`, and the live kora_theme script
+re-applies everything once it is reachable. After changing
+`kora_theme/theme.json` — or after updating kora_theme itself — refresh the
+copies:
 ```
-node tools/sync-theme.mjs           # copy from ../kora_theme
+node tools/sync-theme.mjs           # copy from kora_theme (found automatically)
 node tools/sync-theme.mjs --check   # exit 1 if the copies are stale
 ```
+
+Fonts follow kora_theme's `"fonts"` block (`heading`, `body`, `mono`) and the
+`/config` font settings, exactly like every other Kora UI: the heading font is
+used for the server name, the mono font for the `LOADING 42%` line, the body
+font everywhere else. Because the font files are synced locally, the chosen font
+renders from the first frame instead of only once kora_theme answers. Set
+`Config.theme.fonts = false` to keep the plain built-in stack regardless of the
+theme; colours always follow kora_theme either way.
 Colours are set in one place, `kora_theme/theme.json` (not in Lua), then restart
 `kora_theme`. Set the palette once and every kora_theme consumer picks it up
 automatically:
@@ -114,8 +124,9 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 - **Server name / tips / progress text / media** — `Config.serverName`,
   `Config.tips`, `Config.showProgressText` and `Config.media` in `config.lua`.
-- **Accent colour and other theme tokens** — set in `kora_theme/theme.json`;
-  players can override their own accent with `/theme`.
+- **Accent colour, fonts and other theme tokens** — set in
+  `kora_theme/theme.json`; players can override their own accent with `/theme`.
+  `Config.theme.fonts` turns the theme font off for this screen only.
 - **Layout/markup** — `html/index.html`, `html/style.css`, `html/app.js`.
   Bump the `?v=` query string on `style.css`/`app.js` when editing either, to
   bust FiveM's NUI (CEF) cache across reconnects.

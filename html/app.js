@@ -119,6 +119,21 @@
     }, 6000);
   }
 
+  // ---- Theme --------------------------------------------------------------
+  // kora_theme's theme.js sets --font-sans/--font-heading/--font-mono inline on
+  // :root, which outranks any stylesheet rule, and re-applies them whenever the
+  // live script loads or the theme refreshes. Opting out therefore has to shadow
+  // those three on <body>: custom properties resolve per element, so a body-level
+  // value wins for the whole page without fighting :root or needing !important.
+  const fontSlots = ["font-sans", "font-heading", "font-mono"];
+
+  function applyTheme(theme) {
+    if (!theme || theme.fonts !== false) return;
+    for (const slot of fontSlots) {
+      document.body.style.setProperty(`--${slot}`, slot === "font-mono" ? "var(--kora-mono)" : "var(--kora-sans)");
+    }
+  }
+
   // ---- Media --------------------------------------------------------------
   // Only a path inside this resource's html folder or an https:// / nui:// URL is accepted.
   function mediaUrl(value) {
@@ -202,6 +217,7 @@
       startTips(result.tips);
       showText = result.showProgressText !== false;
       document.body.classList.toggle("no-progress-text", !showText);
+      applyTheme(result.theme);
       applyMedia(result.media);
     });
   }
