@@ -135,34 +135,59 @@
   }
 
   // ---- Media --------------------------------------------------------------
-  // Only a path inside this resource's html folder or an https:// / nui:// URL is accepted.
-  function mediaUrl(value) {
+  // Only a path inside this resource's html folder or an https:// / nui:// URL is
+  // accepted. `base` turns a relative path into a URL on another resource's NUI
+  // origin, used for wallpapers named in kora_theme's own theme.json.
+  function mediaUrl(value, base) {
     if (typeof value !== "string") return null;
     const url = value.trim();
     if (/^(https:\/\/|nui:\/\/)/i.test(url)) return url;
-    return /^[\w][\w./ %-]*$/.test(url) && !url.includes("..") ? url : null;
+    if (!/^[\w][\w./ %-]*$/.test(url) || url.includes("..")) return null;
+    return base ? base + url : url;
   }
 
-  function startSlides(images, seconds) {
-    const urls = (Array.isArray(images) ? images : []).map(mediaUrl).filter(Boolean);
+  // Any still or animated format the browser can paint works as a wallpaper
+  // (png, jpeg, webp, gif, svg, avif), from html/media/ or from a CDN, so no
+  // extension list is enforced here -- CDN URLs often have none. Each source is
+  // preloaded instead: a dead link or a blocked CDN drops out of the rotation
+  // rather than covering the themed backdrop with a blank layer.
+  function startSlides(urls, seconds) {
     clearInterval(slideTimer);
     slidesEl.textContent = "";
     if (!urls.length) return;
-    const nodes = urls.map((url) => {
+
+    let index = 0;
+    const nodes = [];
+    const ready = () => nodes.filter((node) => node.dataset.ready === "1");
+
+    function show() {
+      const list = ready();
+      if (!list.length) return;
+      const node = list[index % list.length];
+      index += 1;
+      for (const other of list) other.classList.toggle("active", other === node);
+      document.body.classList.add("has-media");
+    }
+
+    for (const url of urls) {
       const slide = document.createElement("div");
       slide.className = "slide";
-      slide.style.backgroundImage = `url("${encodeURI(url)}")`;
       slidesEl.appendChild(slide);
-      return slide;
-    });
-    let current = 0;
-    nodes[0].classList.add("active");
-    if (nodes.length < 2) return;
-    slideTimer = setInterval(() => {
-      nodes[current].classList.remove("active");
-      current = (current + 1) % nodes.length;
-      nodes[current].classList.add("active");
-    }, Math.max(2, Number(seconds) || 8) * 1000);
+      nodes.push(slide);
+      const probe = new Image();
+      probe.addEventListener("load", () => {
+        slide.style.backgroundImage = `url("${probe.src}")`;
+        slide.dataset.ready = "1";
+        if (!slidesEl.querySelector(".slide.active")) show();
+      });
+      probe.addEventListener("error", () => {
+        console.warn(`[kora_loading] wallpaper could not be loaded: ${url}`);
+      });
+      probe.src = encodeURI(url);
+    }
+
+    if (urls.length < 2) return;
+    slideTimer = setInterval(show, Math.max(2, Number(seconds) || 8) * 1000);
   }
 
   function startVideo(value) {
@@ -172,8 +197,34 @@
     videoEl.loop = true;
     videoEl.src = url;
     videoEl.classList.add("active");
+    videoEl.addEventListener("loadeddata", () => document.body.classList.add("has-media"), { once: true });
     videoEl.addEventListener("error", () => videoEl.classList.remove("active"), { once: true });
     videoEl.play().catch(() => {});
+  }
+
+  // Wallpaper sources, most specific first: what config.lua lists, then what
+  // kora_theme's theme.json asks for, then the built-in default. A configured
+  // video owns the backdrop, and backdrop = false means "paint nothing", so
+  // neither pulls in a default wallpaper nobody asked for.
+  function wallpapers(media, themeWallpaper) {
+    const configured = (Array.isArray(media.images) ? media.images : []).map((value) => mediaUrl(value)).filter(Boolean);
+    if (configured.length) return configured;
+    if (mediaUrl(media.video) || media.backdrop === false) return [];
+    const themed = (Array.isArray(themeWallpaper) ? themeWallpaper : [themeWallpaper])
+      // A bare path in theme.json names a file kora_theme ships, not one of ours.
+      .map((value) => mediaUrl(value, "https://cfx-nui-kora_theme/"))
+      .filter(Boolean);
+    if (themed.length) return themed;
+    return [mediaUrl(media.defaultWallpaper)].filter(Boolean);
+  }
+
+  // kora_theme's theme.json, from the copy synced into this resource by
+  // tools/sync-theme.mjs -- the same copy the colours come from, so there is
+  // nothing to wait for and no cross-origin fetch while the page is on screen.
+  function themeFile() {
+    return fetch("kora_theme/theme.json")
+      .then((response) => (response.ok ? response.json() : null))
+      .catch(() => null);
   }
 
   function startMusic(value, volume) {
@@ -185,13 +236,14 @@
     audio.play().catch(() => {});
   }
 
-  function applyMedia(media) {
+  function applyMedia(media, useThemeWallpaper) {
     if (!media) return;
     if (media.backdrop === false) backdropEl.classList.add("transparent");
     backdropEl.style.setProperty("--dim", String(Math.min(1, Math.max(0, Number(media.dim) || 0))));
-    startSlides(media.images, media.slideSeconds);
     startVideo(media.video);
     startMusic(media.music, media.musicVolume);
+    const theme = useThemeWallpaper ? themeFile() : Promise.resolve(null);
+    theme.then((payload) => startSlides(wallpapers(media, payload && payload.wallpaper), media.slideSeconds));
   }
 
   // ---- Config from Lua ----------------------------------------------------
@@ -218,7 +270,7 @@
       showText = result.showProgressText !== false;
       document.body.classList.toggle("no-progress-text", !showText);
       applyTheme(result.theme);
-      applyMedia(result.media);
+      applyMedia(result.media, result.media && result.media.themeWallpaper !== false);
     });
   }
 

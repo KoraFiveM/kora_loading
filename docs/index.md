@@ -61,24 +61,47 @@ init-function and map-load events as a fallback) and never moves backwards.
 Next to it the page shows the percentage and the current load stage; set
 `Config.showProgressText = false` to hide that text and keep only the bar.
 
-### Background images, video and music
+### Wallpaper, video and music
 
-With no media configured, a background themed with your kora_theme colours is
-shown. To add your own, put the files in `html/media/` and list them in
-`config.lua` (or use a full `https://` address):
+Out of the box the screen shows the animated Kora Discord banner. To use your
+own, put the files in `html/media/` and list them in `config.lua` (or use a full
+`https://` address):
 ```lua
 Config.media = {
     backdrop = true,
     images = { 'media/city.jpg', 'media/beach.jpg' }, -- several = slideshow
+    defaultWallpaper = 'https://cdn.discordapp.com/banners/...', -- the Kora banner
+    themeWallpaper = true,
     slideSeconds = 8,
     video = '',          -- e.g. 'media/intro.mp4' (muted, looping)
     music = 'media/theme.ogg',
     musicVolume = 0.3,
-    dim = 0.45,          -- darkens the background so text stays readable
+    dim = 0.45,          -- darkens the wallpaper so text stays readable
 }
 ```
-Files in `html/media/` are streamed to the loadscreen automatically. Keep them
-small: players see the screen while they are still downloading your server.
+A wallpaper may be **any still or animated format the browser can paint** —
+`.png`, `.jpg`/`.jpeg`, `.webp`, `.gif`, `.svg`, `.avif` — loaded from a local
+file or from a CDN. Files in `html/media/` are streamed to the loadscreen
+automatically; keep them small, because players see the screen while they are
+still downloading your server. A CDN wallpaper costs nothing to download from
+the server but needs the player's connection, so it is preloaded: if it fails,
+it drops out silently and the themed background shows instead.
+
+Wallpaper sources, most specific first:
+
+1. `Config.media.images` — one wallpaper, or several as a slideshow.
+2. `"wallpaper"` in `kora_theme/theme.json` (unless `themeWallpaper = false`) —
+   a URL, a list of URLs, or a path to a file kora_theme itself ships. Re-run
+   `node tools/sync-theme.mjs` after editing it, like any other theme change.
+   A theme-hosted file comes from kora_theme's own NUI origin, which can answer
+   a moment late during a loadscreen; a CDN URL or a file in `html/media/`
+   appears immediately.
+3. `Config.media.defaultWallpaper` — the Kora Discord banner by default. Set it
+   to `''` for the themed background and nothing else.
+
+A configured `video`, or `backdrop = false`, means no default wallpaper is
+fetched at all. `dim` only applies once a wallpaper or video has actually
+loaded.
 
 ### Matching your server's brand colour and fonts
 
@@ -122,8 +145,9 @@ a Lua theme bridge alive after the loading frame shuts down.
 
 ## Customization
 
-- **Server name / tips / progress text / media** — `Config.serverName`,
-  `Config.tips`, `Config.showProgressText` and `Config.media` in `config.lua`.
+- **Server name / tips / progress text / wallpaper and media** —
+  `Config.serverName`, `Config.tips`, `Config.showProgressText` and
+  `Config.media` in `config.lua`.
 - **Accent colour, fonts and other theme tokens** — set in
   `kora_theme/theme.json`; players can override their own accent with `/theme`.
   `Config.theme.fonts` turns the theme font off for this screen only.

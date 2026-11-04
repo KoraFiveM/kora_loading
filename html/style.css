@@ -74,7 +74,15 @@ body {
 
 .bg-video.active { display: block; }
 
+/* Darkening exists to keep text readable over a wallpaper or video, so it only
+   applies once one has actually loaded -- a dead CDN link must not leave the
+   themed backdrop dimmed for no reason. */
 .dim {
+  background: hsl(var(--background, 0 0% 6%) / 0);
+  transition: background-color 600ms ease;
+}
+
+.has-media .dim {
   background: hsl(var(--background, 0 0% 6%) / var(--dim, 0.45));
 }
 

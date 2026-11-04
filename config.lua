@@ -21,13 +21,23 @@ Config.theme = {
     fonts = true,
 }
 
--- Background media. Every option is optional: with nothing set, a background themed with
--- the kora_theme colours is shown. A path is relative to this resource's html/ folder
--- (put your files in html/media/, e.g. 'media/city.jpg') or a full https:// URL.
+-- Background media. Every option is optional. A path is relative to this resource's
+-- html/ folder (put your files in html/media/, e.g. 'media/city.jpg') or a full
+-- https:// URL, so local files and a CDN both work. Wallpapers may be any still or
+-- animated format the browser can paint: png, jpg/jpeg, webp, gif, svg or avif.
+--
+-- Wallpaper sources, most specific first: Config.media.images, then the "wallpaper"
+-- key in kora_theme's theme.json, then Config.media.defaultWallpaper.
 Config.media = {
     backdrop = true,    -- paint the themed background; false leaves the page transparent
-    images = {},        -- one or more images; several are shown as a slideshow
-    slideSeconds = 8,   -- seconds each image is shown
+    images = {},        -- one or more wallpapers; several are shown as a slideshow
+    -- Used when nothing above is set: the animated Kora Discord banner. Replace it
+    -- with your own server's banner, or set it to '' for the themed background only.
+    -- Discord serves this URL at the size asked for by `size=`; raise it for a
+    -- sharper fullscreen image.
+    defaultWallpaper = 'https://cdn.discordapp.com/banners/1565098239345303633/a_997cab204dc43b4a941d8e341aed5d34.webp?size=480&animated=true',
+    themeWallpaper = true, -- let a "wallpaper" in kora_theme's theme.json set the wallpaper
+    slideSeconds = 8,   -- seconds each wallpaper is shown
     video = '',         -- looping, muted background video (mp4/webm); drawn over the images
     music = '',         -- looping music (ogg/mp3)
     musicVolume = 0.3,  -- 0 to 1
@@ -58,7 +68,15 @@ if Kora and Kora.config and Kora.config.adopt then
     })
     Config.media.images = Kora.config.list(Config.media.images, Kora.config.string('', { minLength = 1 }), {
         label = 'Background images',
-        description = 'Images shown behind the loading screen, one per row. Use a path inside this resource such as media/city.jpg (place the file in the html/media folder) or a full https:// address. Several images play as a slideshow. Leave empty to use the themed background.',
+        description = 'Images shown behind the loading screen, one per row. Use a path inside this resource such as media/city.jpg (place the file in the html/media folder) or a full https:// address. png, jpg, webp, gif, svg and avif all work, animated included. Several images play as a slideshow. Leave empty to use the default wallpaper.',
+    })
+    Config.media.defaultWallpaper = Kora.config.string(Config.media.defaultWallpaper, {
+        label = 'Default wallpaper',
+        description = 'The wallpaper used when no background image is listed above and your theme does not set one. Defaults to the animated Kora Discord banner. Use a path inside this resource such as media/banner.webp or a full https:// address, or leave it empty for the themed background only.',
+    })
+    Config.media.themeWallpaper = Kora.config.boolean(Config.media.themeWallpaper, {
+        label = 'Allow a theme wallpaper',
+        description = 'When enabled, a "wallpaper" entry in kora_theme\'s theme.json sets the loading-screen wallpaper, so your theme can change it without touching this resource. Any background image listed above still wins.',
     })
     Config.media.slideSeconds = Kora.config.number(Config.media.slideSeconds, {
         label = 'Seconds per image', min = 2, max = 120,
