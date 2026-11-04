@@ -13,6 +13,7 @@ RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
         showProgressText = Config.showProgressText,
         theme = Config.theme,
         media = Config.media,
+        musicPlayer = Config.musicPlayer,
     })
 end)
 

@@ -103,6 +103,43 @@ A configured `video`, or `backdrop = false`, means no default wallpaper is
 fetched at all. `dim` only applies once a wallpaper or video has actually
 loaded.
 
+### Music player
+
+List one or more tracks and the screen shows a music player with the song
+title, the artist, play/pause, skip, a volume slider and mute:
+```lua
+Config.musicPlayer = {
+    enabled = true,
+    volume = 0.3,
+    tracks = {
+        { title = 'Night Drive', artist = 'Kora Radio', url = 'media/night-drive.mp3' },
+        { title = 'Static',      artist = 'Kora Radio', url = 'https://cdn.example.com/static.mp3' },
+    },
+}
+```
+- **With no tracks listed nothing is drawn**, so the player can stay enabled on
+  a server that wants a silent loading screen.
+- A `url` is a path inside `html/` or a full `https://` address, in any format
+  the browser can decode: `.mp3`, `.ogg`, `.wav`, `.m4a`/`.aac`, `.flac`,
+  `.webm`, or the audio track of an `.mp4`. A track that will not play is
+  skipped; if none of them play, the panel hides itself.
+- `title` and `artist` are optional — a track with no title is labelled with its
+  file name.
+- The volume and mute state a player picks are remembered for their next
+  connect. `Config.musicPlayer.volume` only sets the starting point.
+- Tracks play in order and loop back to the first. A single track loops in
+  place.
+- The controls are **mouse-only**: a loadscreen never gets keyboard focus. The
+  cursor comes from `loadscreen_cursor 'yes'` in `fxmanifest.lua`, which is also
+  what makes a mouse pointer visible while the screen is up.
+- Browsers may refuse to start audio before the player has clicked something.
+  When that happens the panel appears paused with a "press play" hint rather
+  than silently failing.
+
+`Config.media.music` still works: with the player enabled it becomes a
+one-track playlist shown in the panel, and with `enabled = false` it keeps
+playing silently with no panel at all, at `Config.media.musicVolume`.
+
 ### Matching your server's brand colour and fonts
 
 The screen doesn't have its own colour or font config. A loadscreen is shown
@@ -148,6 +185,7 @@ a Lua theme bridge alive after the loading frame shuts down.
 - **Server name / tips / progress text / wallpaper and media** —
   `Config.serverName`, `Config.tips`, `Config.showProgressText` and
   `Config.media` in `config.lua`.
+- **Music player** — `Config.musicPlayer` in `config.lua`.
 - **Accent colour, fonts and other theme tokens** — set in
   `kora_theme/theme.json`; players can override their own accent with `/theme`.
   `Config.theme.fonts` turns the theme font off for this screen only.

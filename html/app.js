@@ -9,6 +9,14 @@
   const backdropEl = document.getElementById("backdrop");
   const slidesEl = document.getElementById("slides");
   const videoEl = document.getElementById("bg-video");
+  const musicEl = document.getElementById("music");
+  const musicTitleEl = document.getElementById("music-title");
+  const musicArtistEl = document.getElementById("music-artist");
+  const musicToggleEl = document.getElementById("music-toggle");
+  const musicNextEl = document.getElementById("music-next");
+  const musicMuteEl = document.getElementById("music-mute");
+  const musicVolumeEl = document.getElementById("music-volume");
+  const musicHintEl = document.getElementById("music-hint");
 
   let tips = [];
   let tipIndex = 0;
@@ -227,12 +235,213 @@
       .catch(() => null);
   }
 
-  function startMusic(value, volume) {
-    const url = mediaUrl(value);
-    if (!url) return;
-    audio = new Audio(url);
+  // ---- Music player -------------------------------------------------------
+  // Any audio format the browser can decode works (mp3, ogg, wav, m4a/aac,
+  // flac, webm, and the audio track of an mp4), so no extension list is
+  // enforced -- a track that will not decode is skipped at runtime instead.
+  //
+  // The panel is mouse-only: a loadscreen never gets keyboard focus, and the
+  // cursor comes from `loadscreen_cursor 'yes'` in fxmanifest.lua.
+  const volumeKey = "kora_loading:volume";
+  const mutedKey = "kora_loading:muted";
+
+  let tracks = [];
+  let trackIndex = 0;
+  let lastVolume = 0.3;
+  let waitingForClick = false;
+
+  const text = (value) => (typeof value === "string" ? value.trim().slice(0, 120) : "");
+
+  function stored(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function remember(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (_) {
+      // Storage can be unavailable; the player just forgets between connects.
+    }
+  }
+
+  // Fallback "now playing" label for a track configured without a title.
+  function fileName(url) {
+    const path = url.split(/[?#]/)[0];
+    const last = path.slice(path.lastIndexOf("/") + 1).replace(/\.[a-z0-9]+$/i, "");
+    try {
+      return text(decodeURIComponent(last));
+    } catch (_) {
+      return text(last);
+    }
+  }
+
+  // A plain string is accepted alongside { url, title, artist } so the older
+  // single Config.media.music keeps working as a one-track playlist.
+  function playlistFrom(player, media) {
+    const configured = Array.isArray(player && player.tracks) ? player.tracks : [];
+    const list = [];
+    for (const entry of configured) {
+      const track = typeof entry === "string" ? { url: entry } : entry;
+      const url = track && mediaUrl(track.url);
+      if (!url) continue;
+      list.push({ url, title: text(track.title) || fileName(url), artist: text(track.artist) });
+    }
+    if (list.length) return list;
+    const single = mediaUrl(media && media.music);
+    return single ? [{ url: single, title: fileName(single), artist: "" }] : [];
+  }
+
+  function setPaused(paused) {
+    musicEl.classList.toggle("paused", paused);
+    musicToggleEl.setAttribute("aria-label", paused ? "Play" : "Pause");
+  }
+
+  function setVolume(volume, persist) {
+    const value = Math.min(1, Math.max(0, Number(volume) || 0));
+    audio.volume = value;
+    musicVolumeEl.value = String(Math.round(value * 100));
+    if (value > 0) lastVolume = value;
+    if (persist) remember(volumeKey, String(value));
+  }
+
+  // Muting leaves the volume alone, so unmuting restores exactly what was set.
+  function setMuted(muted, persist) {
+    audio.muted = muted;
+    musicEl.classList.toggle("muted", muted);
+    musicMuteEl.setAttribute("aria-label", muted ? "Unmute" : "Mute");
+    if (persist) remember(mutedKey, muted ? "1" : "0");
+  }
+
+  // Chromium can refuse to start audio without a user gesture. Rather than fail
+  // silently, show the panel paused with a hint so the player can start it. The
+  // listener sits on the panel, not the document: the rest of the page keeps
+  // pointer-events: none, so a click anywhere else is never seen here.
+  function armGesture() {
+    if (waitingForClick) return;
+    waitingForClick = true;
+    musicHintEl.hidden = false;
+    musicEl.addEventListener("pointerdown", () => {
+      waitingForClick = false;
+      musicHintEl.hidden = true;
+      if (audio.paused) startPlayback();
+    }, { once: true });
+  }
+
+  function startPlayback() {
+    audio.play().then(() => {
+      musicHintEl.hidden = true;
+      setPaused(false);
+    }).catch((error) => {
+      setPaused(true);
+      // A source the browser cannot decode is a dead track, not a blocked
+      // autoplay: skip it instead of asking the player to press play.
+      if (error && error.name === "NotSupportedError") return dropTrack();
+      armGesture();
+    });
+  }
+
+  // Tracks are marked dead rather than counted, so a playlist of bad paths can
+  // never spin through an endless skip loop whatever order the media events
+  // arrive in.
+  function dropTrack() {
+    const track = tracks[trackIndex];
+    if (!track || track.dead) return;
+    console.warn(`[kora_loading] track could not be played: ${track.url}`);
+    track.dead = true;
+    advance();
+  }
+
+  function advance() {
+    for (let step = 1; step <= tracks.length; step += 1) {
+      const index = (trackIndex + step) % tracks.length;
+      if (!tracks[index].dead) return loadTrack(index);
+    }
+    // Nothing is playable -- a wrong path or a blocked CDN. Hide the panel
+    // rather than leave dead controls on screen.
+    musicEl.hidden = true;
+  }
+
+  function loadTrack(index) {
+    if (!tracks.length) return;
+    trackIndex = ((index % tracks.length) + tracks.length) % tracks.length;
+    const track = tracks[trackIndex];
+    musicTitleEl.textContent = track.title || "Unknown track";
+    musicArtistEl.textContent = track.artist;
+    musicArtistEl.hidden = !track.artist;
+    // A lone track loops in place; a playlist advances on "ended" instead, so
+    // reloading the same source never leaves a gap.
+    audio.loop = tracks.length === 1;
+    audio.src = encodeURI(track.url);
+    startPlayback();
+  }
+
+  function showPlayer(player, media) {
+    audio = new Audio();
+    audio.preload = "auto";
+    // A player's own volume wins over the configured one, but a missing or
+    // unreadable value must not silence the music.
+    const saved = stored(volumeKey);
+    const savedVolume = saved ? Number(saved) : NaN;
+    setVolume(Number.isFinite(savedVolume) ? savedVolume : volumeOf(player && player.volume, media && media.musicVolume), false);
+    setMuted(stored(mutedKey) === "1", false);
+
+    musicToggleEl.addEventListener("click", () => {
+      if (!audio.paused) {
+        audio.pause();
+        setPaused(true);
+        return;
+      }
+      startPlayback();
+    });
+    musicNextEl.addEventListener("click", () => advance());
+    musicMuteEl.addEventListener("click", () => {
+      if (!audio.muted) return setMuted(true, true);
+      setMuted(false, true);
+      if (audio.volume === 0) setVolume(lastVolume || 0.3, true);
+    });
+    // Dragging the slider to zero reads as muting, and off zero as unmuting.
+    musicVolumeEl.addEventListener("input", () => {
+      const value = Number(musicVolumeEl.value) / 100;
+      const silent = value === 0;
+      setVolume(value, true);
+      if (silent !== audio.muted) setMuted(silent, true);
+    });
+
+    audio.addEventListener("playing", () => setPaused(false));
+    audio.addEventListener("pause", () => setPaused(true));
+    audio.addEventListener("ended", () => advance());
+    audio.addEventListener("error", dropTrack);
+
+    musicEl.hidden = false;
+    loadTrack(0);
+  }
+
+  // First value that is actually set wins, so an unset option falls through to
+  // the next instead of silencing the music.
+  function volumeOf(...values) {
+    for (const value of values) {
+      if (value === undefined || value === null || value === "") continue;
+      const volume = Number(value);
+      if (Number.isFinite(volume)) return Math.min(1, Math.max(0, volume));
+    }
+    return 0.3;
+  }
+
+  function startMusic(player, media) {
+    tracks = playlistFrom(player, media);
+    // Nothing configured: the panel never appears, so the player can stay
+    // enabled on a server that wants a silent loading screen.
+    if (!tracks.length) return;
+    if (player && player.enabled !== false) return showPlayer(player, media);
+    // Player off: keep the plain looping background music, at the volume that
+    // has always belonged to it, with no panel and no controls.
+    audio = new Audio(encodeURI(tracks[0].url));
     audio.loop = true;
-    audio.volume = Math.min(1, Math.max(0, Number(volume) || 0));
+    audio.volume = volumeOf(media && media.musicVolume);
     audio.play().catch(() => {});
   }
 
@@ -241,7 +450,6 @@
     if (media.backdrop === false) backdropEl.classList.add("transparent");
     backdropEl.style.setProperty("--dim", String(Math.min(1, Math.max(0, Number(media.dim) || 0))));
     startVideo(media.video);
-    startMusic(media.music, media.musicVolume);
     const theme = useThemeWallpaper ? themeFile() : Promise.resolve(null);
     theme.then((payload) => startSlides(wallpapers(media, payload && payload.wallpaper), media.slideSeconds));
   }
@@ -271,6 +479,7 @@
       document.body.classList.toggle("no-progress-text", !showText);
       applyTheme(result.theme);
       applyMedia(result.media, result.media && result.media.themeWallpaper !== false);
+      startMusic(result.musicPlayer, result.media);
     });
   }
 

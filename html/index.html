@@ -19,7 +19,7 @@
        stale cached copy of these files across reconnects/restarts,
        independent of the server-side resource actually updating -- bump
        this value on every change to html/app.js or html/style.css. -->
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body>
   <main class="screen">
@@ -41,6 +41,37 @@
       <p id="progress-status" class="status"></p>
     </div>
 
+    <!-- Hidden until a playlist is configured, and mouse-only: a loadscreen
+         gets no keyboard focus, so every control has to be clickable. -->
+    <div id="music" class="music" hidden>
+      <div class="music-now">
+        <span class="music-label">NOW PLAYING</span>
+        <span id="music-title" class="music-title"></span>
+        <span id="music-artist" class="music-artist"></span>
+      </div>
+      <div class="music-controls">
+        <button id="music-toggle" class="music-button music-toggle" type="button" aria-label="Pause">
+          <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z" fill="currentColor"/></svg>
+          <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        </button>
+        <button id="music-next" class="music-button" type="button" aria-label="Next track">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6v12l8-6zM16 6h2v12h-2z" fill="currentColor"/></svg>
+        </button>
+        <button id="music-mute" class="music-button music-mute" type="button" aria-label="Mute">
+          <svg class="icon-sound" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
+            <path d="M14.5 9a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-silent" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
+            <path d="M15 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <input id="music-volume" class="music-volume" type="range" min="0" max="100" step="1" value="30" aria-label="Volume" />
+      </div>
+      <span id="music-hint" class="music-hint" hidden>Press play to start the music</span>
+    </div>
+
     <div class="progress">
       <div id="progress-fill" class="progress-fill"></div>
     </div>
@@ -59,6 +90,6 @@
       window.addEventListener("resize", resize);
     })();
   </script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

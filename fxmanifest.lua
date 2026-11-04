@@ -15,6 +15,10 @@ dependency 'kora_lib'
 
 loadscreen 'html/index.html'
 loadscreen_manual_shutdown 'yes'
+-- A loadscreen gets no keyboard focus, so the music player's controls are
+-- reachable only with the mouse. This is what puts a cursor on the screen;
+-- without it the player still shows what is playing but cannot be clicked.
+loadscreen_cursor 'yes'
 
 files {
     'html/index.html',

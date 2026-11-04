@@ -44,6 +44,19 @@ Config.media = {
     dim = 0.45,         -- 0 to 1, how much the background is darkened so text stays readable
 }
 
+-- Music player. The panel is only drawn when at least one track is listed, so
+-- this can stay enabled on a server that wants a silent loading screen. A url is
+-- a path inside html/ or a full https:// address, in any format the browser can
+-- decode: mp3, ogg, wav, m4a/aac, flac, webm, or the audio of an mp4.
+-- With enabled = false, a Config.media.music track still loops silently as before.
+Config.musicPlayer = {
+    enabled = true,
+    volume = 0.3,   -- 0 to 1, the starting volume; players can change it and it is remembered
+    tracks = {
+        -- { title = 'Night Drive', artist = 'Kora Radio', url = 'media/night-drive.mp3' },
+    },
+}
+
 -- Registers this resource-owned configuration with kora_lib without changing its public Config table.
 if Kora and Kora.config and Kora.config.adopt then
     Config.serverName = Kora.config.string(Config.serverName, {
@@ -88,11 +101,23 @@ if Kora and Kora.config and Kora.config.adopt then
     })
     Config.media.music = Kora.config.string(Config.media.music, {
         label = 'Background music',
-        description = 'Looping music played while loading, as a path inside this resource such as media/theme.ogg or a full https:// address. Leave empty for no music.',
+        description = 'Looping music played while loading, as a path inside this resource such as media/theme.ogg or a full https:// address. Leave empty for no music. With the music player enabled and no tracks listed for it, this song is shown in the player; otherwise it plays with no controls.',
     })
     Config.media.musicVolume = Kora.config.number(Config.media.musicVolume, {
         label = 'Music volume', min = 0, max = 1,
-        description = 'Volume of the background music, from 0 (silent) to 1 (full).',
+        description = 'Volume of the background music above, from 0 (silent) to 1 (full). The music player has its own volume setting.',
+    })
+    Config.musicPlayer.enabled = Kora.config.boolean(Config.musicPlayer.enabled, {
+        label = 'Music player',
+        description = 'When enabled and at least one track is listed below, the loading screen shows a music player with the song title and artist, play/pause, skip, a volume slider and mute. With no tracks listed nothing is shown. Disable it to play the background music silently with no controls.',
+    })
+    Config.musicPlayer.volume = Kora.config.number(Config.musicPlayer.volume, {
+        label = 'Music player volume', min = 0, max = 1,
+        description = 'The volume the music starts at, from 0 (silent) to 1 (full). Players can change it with the slider and their choice is remembered for next time.',
+    })
+    Config.musicPlayer.tracks = Kora.config.list(Config.musicPlayer.tracks, Kora.config.object({}), {
+        label = 'Music player tracks',
+        description = 'The songs the loading screen plays, one row each, with the fields url, title and artist. Use a url inside this resource such as media/song.mp3 (place the file in the html/media folder) or a full https:// address; mp3, ogg, wav, m4a, flac, webm and mp4 all work. The title and artist are shown while that song plays. Leave empty for no music player.',
     })
     Config.media.dim = Kora.config.number(Config.media.dim, {
         label = 'Background darkening', min = 0, max = 1,
