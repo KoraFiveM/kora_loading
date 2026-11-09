@@ -44,3 +44,6 @@ shared_scripts { 'config.lua' }
 client_scripts {
     'client.lua',
 }
+
+-- kora_qa: Gherkin test scenarios (converted legacy tests), see [kora]/kora_qa/README.md
+qa_feature 'tests/*.feature'
