@@ -1,11 +1,4 @@
 :root {
-  /* Fallback stacks only. kora_theme owns the real fonts: theme.js sets
-     --font-sans/--font-heading/--font-mono inline on :root from theme.json's
-     "fonts" (and the /config font settings), and the @font-face rules for the
-     bundled families come from kora_theme/fonts/fonts.css. These values match
-     fonts/catalog.json "defaults" and are used when kora_theme has not answered
-     yet or when Config.theme.fonts is off. Never hard-code a family below --
-     always go through var(--font-*, ...) so a theme change needs no edit here. */
   --kora-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --kora-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -28,14 +21,10 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* The loadscreen can overlap NUI during handoff. Keep the page itself
-     transparent so a delayed shutdown can never mask the game camera. */
   background: transparent;
   pointer-events: none;
 }
 
-/* Themed backdrop: sits under everything and is the only opaque layer, so the
-   document and .screen stay transparent. Colours come from kora_theme tokens. */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -74,9 +63,6 @@ body {
 
 .bg-video.active { display: block; }
 
-/* Darkening exists to keep text readable over a wallpaper or video, so it only
-   applies once one has actually loaded -- a dead CDN link must not leave the
-   themed backdrop dimmed for no reason. */
 .dim {
   background: hsl(var(--background, 0 0% 6%) / 0);
   transition: background-color 600ms ease;
@@ -86,8 +72,6 @@ body {
   background: hsl(var(--background, 0 0% 6%) / var(--dim, 0.45));
 }
 
-/* Slow-drifting glows -- depth and motion without anything flashy or
-   coloured beyond the single configured brand accent. */
 .glow {
   position: absolute;
   border-radius: 50%;
@@ -124,8 +108,6 @@ body {
   50% { transform: translate(-50px, -30px); }
 }
 
-/* Faint diagonal grain so large flat surfaces don't look inert -- opacity
-   is deliberately subtle, this is texture, not a pattern to notice. */
 .grain {
   display: none;
 }
@@ -220,11 +202,6 @@ body {
   display: none;
 }
 
-/* Music player. Every colour, radius, shadow and font here comes from a
-   kora_theme token, so a theme change restyles it with no edit to this file.
-   .screen keeps pointer-events: none so a delayed loadscreen shutdown can never
-   swallow a click meant for the game -- this panel is the only thing that takes
-   input, and only while the screen is up. */
 .music {
   position: absolute;
   right: 64px;
@@ -242,7 +219,6 @@ body {
   backdrop-filter: blur(14px);
 }
 
-/* display: flex above would otherwise beat the browser's own [hidden] rule. */
 .music[hidden] {
   display: none;
 }
@@ -316,7 +292,6 @@ body {
   height: 16px;
 }
 
-/* Playing is the resting state: the toggle shows pause, mute shows a speaker. */
 .music-toggle .icon-play,
 .music.paused .music-toggle .icon-pause,
 .music-mute .icon-silent,
@@ -384,7 +359,6 @@ body {
   .server-name { gap: 10px; font-size: clamp(26px, 8vw, 40px); }
   .rail { width: 3px; height: 1em; }
   .tip { margin-top: 12px; font-size: 12px; }
-  /* Out of the way of the text, which goes full width at this size. */
   .music { right: 24px; bottom: auto; top: 24px; width: 216px; }
 }
 @media (max-height: 500px) { .content { bottom: 32px; }.tip { display: none; }.server-name { font-size: 28px; }.music { bottom: 24px; } }

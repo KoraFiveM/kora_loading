@@ -10,54 +10,31 @@ Config.tips = {
     'Tip: buy a house to unlock private storage.',
 }
 
--- Shows the percentage and the current load stage next to the progress bar.
 Config.showProgressText = true
 
--- How closely the screen follows kora_theme. Colours always come from
--- kora_theme's theme.json; this only decides whether its font choice is used
--- too. With fonts = false the screen keeps the plain built-in stack even when
--- theme.json picks a font.
 Config.theme = {
     fonts = true,
 }
 
--- Background media. Every option is optional. A path is relative to this resource's
--- html/ folder (put your files in html/media/, e.g. 'media/city.jpg') or a full
--- https:// URL, so local files and a CDN both work. Wallpapers may be any still or
--- animated format the browser can paint: png, jpg/jpeg, webp, gif, svg or avif.
---
--- Wallpaper sources, most specific first: Config.media.images, then the "wallpaper"
--- key in kora_theme's theme.json, then Config.media.defaultWallpaper.
 Config.media = {
-    backdrop = true,    -- paint the themed background; false leaves the page transparent
-    images = {},        -- one or more wallpapers; several are shown as a slideshow
-    -- Used when nothing above is set: the animated Kora Discord banner. Replace it
-    -- with your own server's banner, or set it to '' for the themed background only.
-    -- Discord serves this URL at the size asked for by `size=`; raise it for a
-    -- sharper fullscreen image.
+    backdrop = true,
+    images = {},
     defaultWallpaper = 'https://cdn.discordapp.com/banners/1565098239345303633/a_997cab204dc43b4a941d8e341aed5d34.webp?size=480&animated=true',
-    themeWallpaper = true, -- let a "wallpaper" in kora_theme's theme.json set the wallpaper
-    slideSeconds = 8,   -- seconds each wallpaper is shown
-    video = '',         -- looping, muted background video (mp4/webm); drawn over the images
-    music = '',         -- looping music (ogg/mp3)
-    musicVolume = 0.3,  -- 0 to 1
-    dim = 0.45,         -- 0 to 1, how much the background is darkened so text stays readable
+    themeWallpaper = true,
+    slideSeconds = 8,
+    video = 'media/loading.mp4',
+    music = '',
+    musicVolume = 0.3,
+    dim = 0.45,
 }
 
--- Music player. The panel is only drawn when at least one track is listed, so
--- this can stay enabled on a server that wants a silent loading screen. A url is
--- a path inside html/ or a full https:// address, in any format the browser can
--- decode: mp3, ogg, wav, m4a/aac, flac, webm, or the audio of an mp4.
--- With enabled = false, a Config.media.music track still loops silently as before.
 Config.musicPlayer = {
     enabled = true,
-    volume = 0.3,   -- 0 to 1, the starting volume; players can change it and it is remembered
+    volume = 0.3,
     tracks = {
-        -- { title = 'Night Drive', artist = 'Kora Radio', url = 'media/night-drive.mp3' },
     },
 }
 
--- Registers this resource-owned configuration with kora_lib without changing its public Config table.
 if Kora and Kora.config and Kora.config.adopt then
     Config.serverName = Kora.config.string(Config.serverName, {
         minLength = 1, label = 'Server name',

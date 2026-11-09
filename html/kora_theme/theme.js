@@ -21,8 +21,22 @@
   // slot -> [CSS variable, kind]. Unset variables fall back to theme.css.
   const fontSlots = { body: ["font-sans", "sans"], heading: ["font-heading", "sans"], mono: ["font-mono", "mono"] };
   const familyList = /^[A-Za-z0-9 ,'"-]+$/;
+  // theme.json "shape": radius (px, 0-24) scales every corner; shadows is "none" or "soft".
+  // A missing "shape" leaves the theme.css defaults. "none" is a zero shadow, not the
+  // keyword, so it still works inside Tailwind's comma-joined box-shadow lists.
+  const shadowSets = {
+    none: { "shadow-low": "0 0 #0000", "shadow-floating": "0 0 #0000", "shadow-modal": "0 0 #0000" },
+    soft: { "shadow-low": "0 2px 8px rgb(0 0 0 / 24%)", "shadow-floating": "0 10px 28px rgb(0 0 0 / 40%)", "shadow-modal": "0 20px 56px rgb(0 0 0 / 50%)" },
+  };
+  const shapeKeys = ["radius", "radius-sm", "radius-lg", "shadow-low", "shadow-floating", "shadow-modal"];
   let configured = {};
+  let loaded = false;
   let overrides = null;
+  // A page without the Lua bridge (the loading screen) sets the player's colour itself:
+  // window.QBThemePagePrimary = "#RRGGBB" (or null), then dispatches "qbtheme:page-primary"
+  // on window when it changes. Every copy of this script on the page follows it. A bridge
+  // override, when there is one, still wins.
+  const pagePrimary = () => (hex.test(window.QBThemePagePrimary || "") ? window.QBThemePagePrimary : null);
   let fileFonts = {};
   let serverFonts = null;
 
@@ -73,6 +87,28 @@
       primary: token("primary"), ring: token("primary"), "focus-ring": token("primary", 0.55), selection: token("primary", 0.35), "brand-hover": token("primary", null, -5.1), "brand-pressed": token("primary", null, -10.6), "brand-soft": token("primary", 0.14), "brand-border": token("primary", 0.45), "primary-foreground": contrast(c.primary),
       success: token("success"), "success-soft": token("success", 0.14), "success-border": token("success", 0.45), "success-foreground": contrast(c.success), warning: token("warning"), "warning-soft": token("warning", 0.14), "warning-border": token("warning", 0.45), "warning-foreground": contrast(c.warning), destructive: token("danger"), danger: token("danger"), "destructive-soft": token("danger", 0.14), "destructive-border": token("danger", 0.45), "destructive-foreground": contrast(c.danger), info: token("info"), "info-soft": token("info", 0.14), "info-border": token("info", 0.45), "info-foreground": contrast(c.info), armour: token("armour"), surface: token("surface", 0.97), "surface-panel": token("surfaceRaised", 0.98), "secondary-text": token("info"),
     };
+  }
+
+  function shapeFrom(shape) {
+    const out = {};
+    if (!shape || typeof shape !== "object" || Array.isArray(shape)) return out;
+    if (typeof shape.radius === "number" && Number.isFinite(shape.radius)) {
+      const r = Math.max(0, Math.min(24, shape.radius));
+      out.radius = `${Math.round(r)}px`;
+      out["radius-sm"] = `${Math.round(r * 0.75)}px`;
+      out["radius-lg"] = `${Math.round(r * 1.25)}px`;
+    }
+    if (Object.prototype.hasOwnProperty.call(shadowSets, shape.shadows)) Object.assign(out, shadowSets[shape.shadows]);
+    return out;
+  }
+
+  function applyShape(shape) {
+    const tokens = shapeFrom(shape);
+    const root = document.documentElement.style;
+    for (const key of shapeKeys) {
+      if (tokens[key]) root.setProperty(`--${key}`, tokens[key]);
+      else root.removeProperty(`--${key}`);
+    }
   }
 
   function applyTokens(tokens) {
@@ -137,9 +173,10 @@
 
   function applyConfigured() {
     const colours = { ...configured };
-    if (typeof overrides === "string" && hex.test(overrides)) colours.primary = overrides;
-    else if (overrides && typeof overrides === "object" && !Array.isArray(overrides)) {
-      for (const role of roles) if (hex.test(overrides[role] || "")) colours[role] = overrides[role];
+    const chosen = overrides ?? pagePrimary();
+    if (typeof chosen === "string" && hex.test(chosen)) colours.primary = chosen;
+    else if (chosen && typeof chosen === "object" && !Array.isArray(chosen)) {
+      for (const role of roles) if (hex.test(chosen[role] || "")) colours[role] = chosen[role];
     }
     applyTokens(tokensFrom(colours));
   }
@@ -172,7 +209,9 @@
       const payload = response.ok && await response.json();
       if (!payload || !payload.colors || typeof payload.colors !== "object") throw new Error("invalid theme.json");
       configured = payload.colors;
+      loaded = true;
       fileFonts = await fontsFrom(payload.fonts);
+      applyShape(payload.shape);
       applyConfigured();
       applyFonts();
       return true;
@@ -194,6 +233,11 @@
     } else if (event.data?.action === "qbtheme:refresh") {
       void loadTheme();
     }
+  });
+
+  // Before theme.json has loaded there is no palette to apply to; loadTheme picks the colour up then.
+  window.addEventListener("qbtheme:page-primary", () => {
+    if (loaded) applyConfigured();
   });
 
   window.QBTheme = Object.freeze({ applyTokens, refresh: () => loadTheme() });

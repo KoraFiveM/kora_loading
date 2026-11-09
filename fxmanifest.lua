@@ -20,7 +20,12 @@ loadscreen_manual_shutdown 'yes'
 -- without it the player still shows what is playing but cannot be clicked.
 loadscreen_cursor 'yes'
 
+-- Hidden in-game page that keeps the loading screen's cached player colour in step with /theme.
+ui_page 'html/sync.html'
+
 files {
+    'html/sync.html',
+    'html/sync.js',
     'html/index.html',
     'html/style.css',
     'html/app.js',

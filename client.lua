@@ -1,26 +1,47 @@
--- NOTE: this resource has its own NUI frame (the `loadscreen` page), separate
--- from kora_lib's shared frame -- Kora.nui.send/registerCallback would dispatch
--- into kora_lib's own resource VM (via the cross-resource export call) and so
--- target kora_lib's frame, not this one. Talk to this resource's own frame with
--- raw natives. Progress comes straight from FiveM's loadscreen message events in the page.
--- Colours come from kora_theme's theme.json through the synced copy in html/kora_theme
--- (tools/sync-theme.mjs), so no Lua theme bridge outlives the loading frame.
+local function plainList(source)
+    local out = {}
+    for _, value in ipairs(source or {}) do out[#out + 1] = value end
+    return out
+end
+
+-- The player's /theme colour lives in kora_theme's client KVP, which only kora_theme can read, and this script
+-- only runs near the end of loading. So the page keeps its own copy (localStorage) for the next loading screen,
+-- and this hands it the current value: a #RRGGBB string, or false for the server default.
+local function playerTheme()
+    local ok, colour = pcall(function() return exports.kora_theme:getPlayerTheme() end)
+    return ok and type(colour) == 'string' and colour or false
+end
+
+-- Keep the loading screen's cached colour current: the sync page answers this once on load, and
+-- kora_theme raises qbtheme:playerThemeChanged (local event) whenever /theme changes or resets.
+RegisterNUICallback('loadingscreen:syncTheme', function(_, cb)
+    cb({ colour = playerTheme() })
+end)
+
+AddEventHandler('qbtheme:playerThemeChanged', function()
+    SendNUIMessage({ action = 'kora_loading:playerTheme', data = playerTheme() })
+end)
 
 RegisterNUICallback('loadingscreen:getTheme', function(_, cb)
+    local media = {}
+    for key, value in pairs(Config.media or {}) do media[key] = value end
+    media.images = plainList(Config.media and Config.media.images)
+
+    local player = {}
+    for key, value in pairs(Config.musicPlayer or {}) do player[key] = value end
+    player.tracks = plainList(Config.musicPlayer and Config.musicPlayer.tracks)
+
     cb({
         serverName = Config.serverName,
-        tips = Config.tips,
+        tips = plainList(Config.tips),
         showProgressText = Config.showProgressText,
         theme = Config.theme,
-        media = Config.media,
-        musicPlayer = Config.musicPlayer,
+        playerTheme = playerTheme(),
+        media = media,
+        musicPlayer = player,
     })
 end)
 
--- `loadscreen_manual_shutdown 'yes'` gives the selection/spawn flow precise
--- control over the handoff. Keep an idempotent local fallback as well: a
--- failed or delayed cross-resource handoff must never leave this page above
--- gameplay after the player has loaded.
 local hasShutdown = false
 
 local function shutdown()

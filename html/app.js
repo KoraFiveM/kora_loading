@@ -1,5 +1,23 @@
 (function () {
-  const resourceName = window.GetParentResourceName ? window.GetParentResourceName() : "kora_loading";
+  // A loadscreen page reports its parent resource as "loadingscreen", which no
+  // NUI callback is registered under, so the real resource name is fixed here.
+  const resourceName = "kora_loading";
+
+  // The player's /theme colour, remembered from the last loading screen. This runs before the deferred
+  // theme.js copies, so they pick it up on their first paint (see QBThemePagePrimary in kora_theme/theme.js).
+  const playerThemeKey = "kora_loading:playerTheme";
+  const hexColour = /^#[0-9a-f]{6}$/i;
+  window.QBThemePagePrimary = hexColour.test(stored(playerThemeKey) || "") ? stored(playerThemeKey) : null;
+
+  // From client.lua once it runs: a #RRGGBB colour, or false for the server default. Saved for next time.
+  function applyPlayerTheme(colour) {
+    const next = typeof colour === "string" && hexColour.test(colour) ? colour : null;
+    if (next) remember(playerThemeKey, next);
+    else forget(playerThemeKey);
+    if (next === window.QBThemePagePrimary) return;
+    window.QBThemePagePrimary = next;
+    window.dispatchEvent(new Event("qbtheme:page-primary"));
+  }
 
   const serverNameEl = document.getElementById("server-name");
   const tipEl = document.getElementById("tip");
@@ -24,17 +42,11 @@
   let slideTimer = null;
   let audio = null;
 
-  // ---- Progress -----------------------------------------------------------
-  // FiveM posts loadscreen progress to this window as message events. The bar
-  // only ever moves forward and is driven purely by those events; the CSS
-  // transition on the fill makes the steps look continuous.
   let progress = 0;
   let sawFraction = false;
   let showText = true;
   const initTotals = {};
 
-  // Rough share of the whole load each game stage covers, used only until the
-  // engine starts sending loadProgress fractions.
   const stages = {
     INIT_CORE: { from: 0, to: 0.1, label: "Starting game" },
     INIT_BEFORE_MAP_LOADED: { from: 0.1, to: 0.35, label: "Preparing world" },
@@ -96,10 +108,8 @@
     if (handler) handler(data);
   });
 
-  // ---- Server name and tips ----------------------------------------------
   function applyServerName(name) {
     if (!name) return;
-    // Keep the accent rail element, just swap the trailing text node.
     const rail = serverNameEl.querySelector(".rail");
     serverNameEl.textContent = "";
     serverNameEl.appendChild(rail);
@@ -127,12 +137,6 @@
     }, 6000);
   }
 
-  // ---- Theme --------------------------------------------------------------
-  // kora_theme's theme.js sets --font-sans/--font-heading/--font-mono inline on
-  // :root, which outranks any stylesheet rule, and re-applies them whenever the
-  // live script loads or the theme refreshes. Opting out therefore has to shadow
-  // those three on <body>: custom properties resolve per element, so a body-level
-  // value wins for the whole page without fighting :root or needing !important.
   const fontSlots = ["font-sans", "font-heading", "font-mono"];
 
   function applyTheme(theme) {
@@ -142,10 +146,6 @@
     }
   }
 
-  // ---- Media --------------------------------------------------------------
-  // Only a path inside this resource's html folder or an https:// / nui:// URL is
-  // accepted. `base` turns a relative path into a URL on another resource's NUI
-  // origin, used for wallpapers named in kora_theme's own theme.json.
   function mediaUrl(value, base) {
     if (typeof value !== "string") return null;
     const url = value.trim();
@@ -154,11 +154,6 @@
     return base ? base + url : url;
   }
 
-  // Any still or animated format the browser can paint works as a wallpaper
-  // (png, jpeg, webp, gif, svg, avif), from html/media/ or from a CDN, so no
-  // extension list is enforced here -- CDN URLs often have none. Each source is
-  // preloaded instead: a dead link or a blocked CDN drops out of the rotation
-  // rather than covering the themed backdrop with a blank layer.
   function startSlides(urls, seconds) {
     clearInterval(slideTimer);
     slidesEl.textContent = "";
@@ -210,38 +205,23 @@
     videoEl.play().catch(() => {});
   }
 
-  // Wallpaper sources, most specific first: what config.lua lists, then what
-  // kora_theme's theme.json asks for, then the built-in default. A configured
-  // video owns the backdrop, and backdrop = false means "paint nothing", so
-  // neither pulls in a default wallpaper nobody asked for.
   function wallpapers(media, themeWallpaper) {
     const configured = (Array.isArray(media.images) ? media.images : []).map((value) => mediaUrl(value)).filter(Boolean);
     if (configured.length) return configured;
     if (mediaUrl(media.video) || media.backdrop === false) return [];
     const themed = (Array.isArray(themeWallpaper) ? themeWallpaper : [themeWallpaper])
-      // A bare path in theme.json names a file kora_theme ships, not one of ours.
       .map((value) => mediaUrl(value, "https://cfx-nui-kora_theme/"))
       .filter(Boolean);
     if (themed.length) return themed;
     return [mediaUrl(media.defaultWallpaper)].filter(Boolean);
   }
 
-  // kora_theme's theme.json, from the copy synced into this resource by
-  // tools/sync-theme.mjs -- the same copy the colours come from, so there is
-  // nothing to wait for and no cross-origin fetch while the page is on screen.
   function themeFile() {
     return fetch("kora_theme/theme.json")
       .then((response) => (response.ok ? response.json() : null))
       .catch(() => null);
   }
 
-  // ---- Music player -------------------------------------------------------
-  // Any audio format the browser can decode works (mp3, ogg, wav, m4a/aac,
-  // flac, webm, and the audio track of an mp4), so no extension list is
-  // enforced -- a track that will not decode is skipped at runtime instead.
-  //
-  // The panel is mouse-only: a loadscreen never gets keyboard focus, and the
-  // cursor comes from `loadscreen_cursor 'yes'` in fxmanifest.lua.
   const volumeKey = "kora_loading:volume";
   const mutedKey = "kora_loading:muted";
 
@@ -264,11 +244,16 @@
     try {
       window.localStorage.setItem(key, value);
     } catch (_) {
-      // Storage can be unavailable; the player just forgets between connects.
     }
   }
 
-  // Fallback "now playing" label for a track configured without a title.
+  function forget(key) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (_) {
+    }
+  }
+
   function fileName(url) {
     const path = url.split(/[?#]/)[0];
     const last = path.slice(path.lastIndexOf("/") + 1).replace(/\.[a-z0-9]+$/i, "");
@@ -279,8 +264,6 @@
     }
   }
 
-  // A plain string is accepted alongside { url, title, artist } so the older
-  // single Config.media.music keeps working as a one-track playlist.
   function playlistFrom(player, media) {
     const configured = Array.isArray(player && player.tracks) ? player.tracks : [];
     const list = [];
@@ -308,7 +291,6 @@
     if (persist) remember(volumeKey, String(value));
   }
 
-  // Muting leaves the volume alone, so unmuting restores exactly what was set.
   function setMuted(muted, persist) {
     audio.muted = muted;
     musicEl.classList.toggle("muted", muted);
@@ -316,10 +298,6 @@
     if (persist) remember(mutedKey, muted ? "1" : "0");
   }
 
-  // Chromium can refuse to start audio without a user gesture. Rather than fail
-  // silently, show the panel paused with a hint so the player can start it. The
-  // listener sits on the panel, not the document: the rest of the page keeps
-  // pointer-events: none, so a click anywhere else is never seen here.
   function armGesture() {
     if (waitingForClick) return;
     waitingForClick = true;
@@ -337,16 +315,11 @@
       setPaused(false);
     }).catch((error) => {
       setPaused(true);
-      // A source the browser cannot decode is a dead track, not a blocked
-      // autoplay: skip it instead of asking the player to press play.
       if (error && error.name === "NotSupportedError") return dropTrack();
       armGesture();
     });
   }
 
-  // Tracks are marked dead rather than counted, so a playlist of bad paths can
-  // never spin through an endless skip loop whatever order the media events
-  // arrive in.
   function dropTrack() {
     const track = tracks[trackIndex];
     if (!track || track.dead) return;
@@ -360,8 +333,6 @@
       const index = (trackIndex + step) % tracks.length;
       if (!tracks[index].dead) return loadTrack(index);
     }
-    // Nothing is playable -- a wrong path or a blocked CDN. Hide the panel
-    // rather than leave dead controls on screen.
     musicEl.hidden = true;
   }
 
@@ -372,8 +343,6 @@
     musicTitleEl.textContent = track.title || "Unknown track";
     musicArtistEl.textContent = track.artist;
     musicArtistEl.hidden = !track.artist;
-    // A lone track loops in place; a playlist advances on "ended" instead, so
-    // reloading the same source never leaves a gap.
     audio.loop = tracks.length === 1;
     audio.src = encodeURI(track.url);
     startPlayback();
@@ -382,8 +351,6 @@
   function showPlayer(player, media) {
     audio = new Audio();
     audio.preload = "auto";
-    // A player's own volume wins over the configured one, but a missing or
-    // unreadable value must not silence the music.
     const saved = stored(volumeKey);
     const savedVolume = saved ? Number(saved) : NaN;
     setVolume(Number.isFinite(savedVolume) ? savedVolume : volumeOf(player && player.volume, media && media.musicVolume), false);
@@ -403,7 +370,6 @@
       setMuted(false, true);
       if (audio.volume === 0) setVolume(lastVolume || 0.3, true);
     });
-    // Dragging the slider to zero reads as muting, and off zero as unmuting.
     musicVolumeEl.addEventListener("input", () => {
       const value = Number(musicVolumeEl.value) / 100;
       const silent = value === 0;
@@ -420,8 +386,6 @@
     loadTrack(0);
   }
 
-  // First value that is actually set wins, so an unset option falls through to
-  // the next instead of silencing the music.
   function volumeOf(...values) {
     for (const value of values) {
       if (value === undefined || value === null || value === "") continue;
@@ -433,12 +397,8 @@
 
   function startMusic(player, media) {
     tracks = playlistFrom(player, media);
-    // Nothing configured: the panel never appears, so the player can stay
-    // enabled on a server that wants a silent loading screen.
     if (!tracks.length) return;
     if (player && player.enabled !== false) return showPlayer(player, media);
-    // Player off: keep the plain looping background music, at the volume that
-    // has always belonged to it, with no panel and no controls.
     audio = new Audio(encodeURI(tracks[0].url));
     audio.loop = true;
     audio.volume = volumeOf(media && media.musicVolume);
@@ -454,11 +414,11 @@
     theme.then((payload) => startSlides(wallpapers(media, payload && payload.wallpaper), media.slideSeconds));
   }
 
-  // ---- Config from Lua ----------------------------------------------------
-  // The callback only exists once this resource's client script is running,
-  // which is after the loadscreen page has loaded, so retry until it answers.
   function fetchNui(callback, data) {
+    const abort = new AbortController();
+    setTimeout(() => abort.abort(), 1500);
     return fetch(`https://${resourceName}/${callback}`, {
+      signal: abort.signal,
       method: "POST",
       headers: { "Content-Type": "application/json; charset=UTF-8" },
       body: JSON.stringify(data || {}),
@@ -467,23 +427,83 @@
       .catch(() => null);
   }
 
-  function loadConfig(attemptsLeft) {
+  // Lua tables that were wrapped by the config layer can reach the page as
+  // objects instead of arrays, which would silently empty the tips and images.
+  function toList(value) {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === "object") return Object.values(value);
+    return [];
+  }
+
+  // Shown only if the resource's client script has not answered yet, so the
+  // screen is never bare while waiting. Real config replaces it on arrival.
+  const fallbackConfig = {
+    tips: [
+      "Tip: press F1 to open the phone.",
+      "Tip: you can holster your weapon to avoid drawing attention.",
+      "Tip: type /report in chat if you run into a bug.",
+      "Tip: robbing a store alerts nearby police.",
+      "Tip: buy a house to unlock private storage.",
+    ],
+    showProgressText: true,
+    media: {
+      backdrop: true,
+      images: [],
+      themeWallpaper: true,
+      defaultWallpaper:
+        "https://cdn.discordapp.com/banners/1565098239345303633/a_997cab204dc43b4a941d8e341aed5d34.webp?size=480&animated=true",
+      slideSeconds: 8,
+      video: "media/loading.mp4",
+      dim: 0.45,
+    },
+  };
+
+  let gotRealConfig = false;
+  let fallbackApplied = false;
+
+  function applyConfig(result, real) {
+    startTips(toList(result.tips));
+    if (result.serverName) applyServerName(result.serverName);
+    showText = result.showProgressText !== false;
+    document.body.classList.toggle("no-progress-text", !showText);
+    const media = Object.assign({}, result.media);
+    media.images = toList(media.images);
+    applyTheme(result.theme);
+    applyMedia(media, media.themeWallpaper !== false);
+    if (real) {
+      if (Object.prototype.hasOwnProperty.call(result, "playerTheme")) applyPlayerTheme(result.playerTheme);
+      const player = Object.assign({}, result.musicPlayer);
+      player.tracks = toList(player.tracks);
+      startMusic(player, media);
+    }
+  }
+
+  // This resource's client script only starts after the game has finished
+  // loading, so during the real loading screen the NUI callback does not exist
+  // yet. Show the built-in defaults at once; the real config replaces them.
+  function showFallback() {
+    if (gotRealConfig || fallbackApplied) return;
+    fallbackApplied = true;
+    console.warn("[kora_loading] getTheme not available yet, using built-in defaults");
+    applyConfig(fallbackConfig, false);
+  }
+
+  setTimeout(showFallback, 300);
+
+  function loadConfig(attemptsLeft, tried) {
     fetchNui("loadingscreen:getTheme").then((result) => {
       if (!result) {
-        if (attemptsLeft > 0) setTimeout(() => loadConfig(attemptsLeft - 1), 1500);
+        showFallback();
+        if (attemptsLeft > 0) setTimeout(() => loadConfig(attemptsLeft - 1, tried + 1), 1500);
         return;
       }
-      applyServerName(result.serverName);
-      startTips(result.tips);
-      showText = result.showProgressText !== false;
-      document.body.classList.toggle("no-progress-text", !showText);
-      applyTheme(result.theme);
-      applyMedia(result.media, result.media && result.media.themeWallpaper !== false);
-      startMusic(result.musicPlayer, result.media);
+      if (gotRealConfig) return;
+      gotRealConfig = true;
+      applyConfig(result, true);
     });
   }
 
-  loadConfig(80);
+  loadConfig(80, 0);
 
   window.addEventListener("beforeunload", () => {
     clearInterval(tipTimer);
