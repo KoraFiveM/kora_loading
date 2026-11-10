@@ -13,12 +13,12 @@ local function playerTheme()
 end
 
 -- Keep the loading screen's cached colour current: the sync page answers this once on load, and
--- kora_theme raises qbtheme:playerThemeChanged (local event) whenever /theme changes or resets.
+-- kora_theme raises kora_theme:playerThemeChanged (local event) whenever /theme changes or resets.
 RegisterNUICallback('loadingscreen:syncTheme', function(_, cb)
     cb({ colour = playerTheme() })
 end)
 
-AddEventHandler('qbtheme:playerThemeChanged', function()
+AddEventHandler('kora_theme:playerThemeChanged', function()
     SendNUIMessage({ action = 'kora_loading:playerTheme', data = playerTheme() })
 end)
 
@@ -52,4 +52,4 @@ local function shutdown()
 end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', shutdown)
-AddEventHandler('qbmultichar:client:spawnComplete', shutdown)
+AddEventHandler('kora_multichar:client:spawnComplete', shutdown)

@@ -4,11 +4,9 @@ lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
 name 'kora_loading'
--- Keep the legacy resource name resolvable for exports['qbloading'] callers.
-provide 'qbloading'
 author 'Jamie'
 version '1.0.0'
-description 'qbtheme-styled loading screen'
+description 'kora_theme-styled loading screen'
 
 dependency 'kora_theme'
 dependency 'kora_lib'
@@ -43,6 +41,8 @@ shared_script '@kora_lib/init.lua'
 shared_scripts { 'config.lua' }
 client_scripts {
     'client.lua',
+    -- Optional FFT hooks: returns immediately unless fft_kora_hooks is true.
+    'fft_hooks.lua'
 }
 
 -- kora_qa: Gherkin test scenarios (converted legacy tests), see [kora]/kora_qa/README.md

@@ -73,7 +73,7 @@ Config.media = {
     defaultWallpaper = 'https://cdn.discordapp.com/banners/...', -- the Kora banner
     themeWallpaper = true,
     slideSeconds = 8,
-    video = '',          -- e.g. 'media/intro.mp4' (muted, looping)
+    video = '',          -- e.g. 'media/intro.webm' (muted, looping; WebM only)
     music = 'media/theme.ogg',
     musicVolume = 0.3,
     dim = 0.45,          -- darkens the wallpaper so text stays readable
@@ -120,8 +120,9 @@ Config.musicPlayer = {
 - **With no tracks listed nothing is drawn**, so the player can stay enabled on
   a server that wants a silent loading screen.
 - A `url` is a path inside `html/` or a full `https://` address, in any format
-  the browser can decode: `.mp3`, `.ogg`, `.wav`, `.m4a`/`.aac`, `.flac`,
-  `.webm`, or the audio track of an `.mp4`. A track that will not play is
+  FiveM's browser can decode: `.mp3`, `.ogg`, `.wav`, `.flac` or `.webm`. It has
+  no AAC or H.264 decoder, so `.m4a`/`.aac` and `.mp4` do not play (the same
+  applies to `Config.media.video`: convert it to WebM). A track that will not play is
   skipped; if none of them play, the panel hides itself.
 - `title` and `artist` are optional — a track with no title is labelled with its
   file name.
@@ -198,6 +199,6 @@ a Lua theme bridge alive after the loading frame shuts down.
 Part of the [qbcore2](https://github.com/qbcore2) resource set:
 
 - [kora_lib](https://qbcore2.github.io/kora_lib/) — shared helper library
-- [qbcore](https://qbcore2.github.io/kora_core/) — framework core
-- [qbmultichar](https://qbcore2.github.io/kora_multichar/) — character selection
+- [kora_core](https://qbcore2.github.io/kora_core/) — framework core
+- [kora_multichar](https://qbcore2.github.io/kora_multichar/) — character selection
 - [full resource list ↗](https://github.com/orgs/qbcore2/repositories)

@@ -4,19 +4,19 @@
   const resourceName = "kora_loading";
 
   // The player's /theme colour, remembered from the last loading screen. This runs before the deferred
-  // theme.js copies, so they pick it up on their first paint (see QBThemePagePrimary in kora_theme/theme.js).
+  // theme.js copies, so they pick it up on their first paint (see KoraThemePagePrimary in kora_theme/theme.js).
   const playerThemeKey = "kora_loading:playerTheme";
   const hexColour = /^#[0-9a-f]{6}$/i;
-  window.QBThemePagePrimary = hexColour.test(stored(playerThemeKey) || "") ? stored(playerThemeKey) : null;
+  window.KoraThemePagePrimary = hexColour.test(stored(playerThemeKey) || "") ? stored(playerThemeKey) : null;
 
   // From client.lua once it runs: a #RRGGBB colour, or false for the server default. Saved for next time.
   function applyPlayerTheme(colour) {
     const next = typeof colour === "string" && hexColour.test(colour) ? colour : null;
     if (next) remember(playerThemeKey, next);
     else forget(playerThemeKey);
-    if (next === window.QBThemePagePrimary) return;
-    window.QBThemePagePrimary = next;
-    window.dispatchEvent(new Event("qbtheme:page-primary"));
+    if (next === window.KoraThemePagePrimary) return;
+    window.KoraThemePagePrimary = next;
+    window.dispatchEvent(new Event("kora_theme:page-primary"));
   }
 
   const serverNameEl = document.getElementById("server-name");
@@ -453,7 +453,7 @@
       defaultWallpaper:
         "https://cdn.discordapp.com/banners/1565098239345303633/a_997cab204dc43b4a941d8e341aed5d34.webp?size=480&animated=true",
       slideSeconds: 8,
-      video: "media/loading.mp4",
+      video: "media/loading.webm",
       dim: 0.45,
     },
   };

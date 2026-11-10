@@ -106,11 +106,11 @@ Feature: kora_loading — game tests
   @kora_loading @legacy:load-video @target:1 @needs:admin @manual
   Scenario: Background video (config)
     """
-    Admin only. 1. Put a short mp4 or webm in html/media/ and set Config.media.video to its path. Restart and reconnect.
+    Admin only. 1. Put a short webm in html/media/ and set Config.media.video to its path. Restart and reconnect.
     2. Then set a bad path and reconnect.
     Expect: the video plays muted and loops behind the text with the dim applied, and no default wallpaper is fetched. A bad path leaves the themed background, not a black box.
     """
-    When I manually: put a short mp4 or webm in html/media/, set Config.media.video to its path, restart and reconnect
+    When I manually: put a short webm in html/media/, set Config.media.video to its path, restart and reconnect
     Then I confirm: the video plays muted and loops behind the text with the dim applied
     And I confirm: no default wallpaper is fetched
     When I manually: set a bad video path and reconnect

@@ -10,7 +10,7 @@
     } catch (_) { /* storage blocked: the loading screen falls back to the server colour */ }
   }
 
-  // Live changes: client.lua forwards kora_theme's qbtheme:playerThemeChanged.
+  // Live changes: client.lua forwards kora_theme's kora_theme:playerThemeChanged.
   window.addEventListener("message", (event) => {
     if (event.data && event.data.action === "kora_loading:playerTheme") save(event.data.data);
   });

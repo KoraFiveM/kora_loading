@@ -22,7 +22,8 @@ Config.media = {
     defaultWallpaper = 'https://cdn.discordapp.com/banners/1565098239345303633/a_997cab204dc43b4a941d8e341aed5d34.webp?size=480&animated=true',
     themeWallpaper = true,
     slideSeconds = 8,
-    video = 'media/loading.mp4',
+    -- WebM (VP8/VP9) only: FiveM's browser ships without the H.264 and AAC decoders, so an .mp4 never plays.
+    video = 'media/loading.webm',
     music = '',
     musicVolume = 0.3,
     dim = 0.45,
@@ -74,7 +75,7 @@ if Kora and Kora.config and Kora.config.adopt then
     })
     Config.media.video = Kora.config.string(Config.media.video, {
         label = 'Background video',
-        description = 'A muted, looping video drawn behind the text, as a path inside this resource such as media/intro.mp4 or a full https:// address. Leave empty for no video.',
+        description = 'A muted, looping video drawn behind the text, as a path inside this resource such as media/intro.webm or a full https:// address. Use a WebM (VP8 or VP9) file: FiveM cannot play H.264, so an mp4 will not show. Leave empty for no video.',
     })
     Config.media.music = Kora.config.string(Config.media.music, {
         label = 'Background music',
@@ -94,7 +95,7 @@ if Kora and Kora.config and Kora.config.adopt then
     })
     Config.musicPlayer.tracks = Kora.config.list(Config.musicPlayer.tracks, Kora.config.object({}), {
         label = 'Music player tracks',
-        description = 'The songs the loading screen plays, one row each, with the fields url, title and artist. Use a url inside this resource such as media/song.mp3 (place the file in the html/media folder) or a full https:// address; mp3, ogg, wav, m4a, flac, webm and mp4 all work. The title and artist are shown while that song plays. Leave empty for no music player.',
+        description = 'The songs the loading screen plays, one row each, with the fields url, title and artist. Use a url inside this resource such as media/song.mp3 (place the file in the html/media folder) or a full https:// address; mp3, ogg, wav, flac and webm all work; m4a and mp4 (AAC) do not play in FiveM. The title and artist are shown while that song plays. Leave empty for no music player.',
     })
     Config.media.dim = Kora.config.number(Config.media.dim, {
         label = 'Background darkening', min = 0, max = 1,
