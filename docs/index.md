@@ -136,7 +136,7 @@ who connect after you save (no restart needed):
 | `videos` | `intro.webm` then nine 13 s scene clips | The rows above. Empty = no clips. |
 | `videoSound` | `true` | Play each video's own soundtrack. Off plays them muted. A row's `audio` always plays either way. |
 | `videoVolume` | `0.5` | Volume of video soundtracks and row audio (0–1). |
-| `videoSoundButton` | `true` | Show a mute button (bottom right) while a clip can make sound. Each player's choice is remembered. |
+| `videoSoundButton` | `true` | Show a mute button and volume slider (bottom right) while a clip can make sound. Each player's mute and volume are remembered; `videoVolume` is the starting level until they move the slider. |
 | `videoOrder` | `'shuffle'` | `sequential` plays top to bottom and loops. `shuffle` plays each video once per round in a random order. `random` picks any video each time. Neither random mode plays the same video twice in a row. |
 | `videoRandomStart` | `false` | With `sequential`, start each player at a random video, then continue in order. |
 | `videoPinFirst` | `true` | The first video plays first on every load, once, as an intro; `videoOrder` then applies to the rest (with `shuffle`, reshuffled every load). A list of only the intro loops it. |

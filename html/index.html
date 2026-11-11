@@ -19,7 +19,7 @@
        stale cached copy of these files across reconnects/restarts,
        independent of the server-side resource actually updating -- bump
        this value on every change to html/app.js or html/style.css. -->
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=13" />
 </head>
 <body>
   <main class="screen">
@@ -74,20 +74,23 @@
       <span id="music-hint" class="music-hint" hidden>Press play to start the music</span>
     </div>
 
-    <!-- Mute/unmute for the playlist's sound. Shown only when a clip can make sound
-         and Config.media.videoSoundButton is on. Also the way to turn sound on if
-         the browser refused to autoplay it. -->
-    <button id="sound-toggle" class="sound-toggle" type="button" aria-label="Mute" hidden>
-      <svg class="icon-sound" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
-        <path d="M14.5 9a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M17 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      <svg class="icon-silent" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
-        <path d="M15 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <!-- Mute and volume for the playlist's sound. Shown only when a clip can make sound
+         and Config.media.videoSoundButton is on. The button is also the way to turn sound
+         on if the browser refused to autoplay it. -->
+    <div id="sound-controls" class="sound-controls" hidden>
+      <button id="sound-toggle" class="sound-toggle" type="button" aria-label="Mute">
+        <svg class="icon-sound" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
+          <path d="M14.5 9a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M17 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon-silent" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3L11 6v12l-4-3.5H4z" fill="currentColor"/>
+          <path d="M15 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <input id="sound-volume" class="music-volume sound-volume" type="range" min="0" max="100" step="1" value="50" aria-label="Video volume" />
+    </div>
 
     <div class="progress">
       <div id="progress-fill" class="progress-fill"></div>
@@ -107,6 +110,6 @@
       window.addEventListener("resize", resize);
     })();
   </script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=17"></script>
 </body>
 </html>

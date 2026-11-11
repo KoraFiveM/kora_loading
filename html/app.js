@@ -27,7 +27,9 @@
   const backdropEl = document.getElementById("backdrop");
   const slidesEl = document.getElementById("slides");
   const videoLayerEl = document.getElementById("videos");
+  const soundControlsEl = document.getElementById("sound-controls");
   const soundToggleEl = document.getElementById("sound-toggle");
+  const soundVolumeEl = document.getElementById("sound-volume");
   const musicEl = document.getElementById("music");
   const musicTitleEl = document.getElementById("music-title");
   const musicArtistEl = document.getElementById("music-artist");
@@ -273,6 +275,8 @@
     // Wait after a hand-over before loading the following clip, so its decoder start-up never lands on the cut.
     const refillDelay = 400;
     const soundMutedKey = "kora_loading:clipSoundMuted";
+    // The player's own clip volume (0..1) from the slider; until they touch it, Config.media.videoVolume applies.
+    const soundVolumeKey = "kora_loading:clipVolume";
 
     const layers = [0, 1].map((index) => {
       const box = document.createElement("div");
@@ -323,7 +327,10 @@
     let sequenceIndex = -1;
     let introPlayed = false;
     let userMuted = stored(soundMutedKey) === "1";
+    let userVolume = clampNumber(stored(soundVolumeKey), 0, 1, null);
+    let lastVolume = userVolume || 0.5;
     let soundBlocked = false;
+    let unblockListener = null;
     const dead = new Set();
 
     const other = (layer) => layers[1 - layer.index];
@@ -400,16 +407,20 @@
       const source = soundOf(layer);
       if (layer.video !== source) layer.video.muted = true;
       if (!source) return;
-      source.volume = Math.min(1, Math.max(0, settings.volume * level));
+      source.volume = Math.min(1, Math.max(0, baseVolume() * level));
       source.muted = userMuted || soundBlocked;
     }
 
+    const baseVolume = () => (userVolume !== null ? userVolume : settings.volume);
+
     function refreshSoundButton() {
       const show = Boolean(settings && settings.soundButton && anySound() && running);
-      soundToggleEl.hidden = !show;
+      soundControlsEl.hidden = !show;
       const silent = userMuted || soundBlocked;
+      soundControlsEl.classList.toggle("muted", silent);
       soundToggleEl.classList.toggle("muted", silent);
       soundToggleEl.setAttribute("aria-label", silent ? "Unmute" : "Mute");
+      if (settings) soundVolumeEl.value = String(Math.round(baseVolume() * 100));
     }
 
     function relevel() {
@@ -425,14 +436,25 @@
       if (soundBlocked) return;
       soundBlocked = true;
       relevel();
-      document.addEventListener("pointerdown", () => {
-        soundBlocked = false;
-        relevel();
-        for (const layer of [active, incoming]) {
-          const source = layer && soundOf(layer);
-          if (source && source.paused && source === layer.audio) source.play().catch(() => {});
-        }
-      }, { once: true, capture: true });
+      unblockListener = (event) => {
+        // A press on the mute button is left to its click handler, which decides between on and off;
+        // unblocking here first would make that same click mute the sound it just turned on.
+        if (soundToggleEl.contains(event.target)) return;
+        resumeSound();
+      };
+      document.addEventListener("pointerdown", unblockListener, true);
+    }
+
+    function resumeSound() {
+      if (!soundBlocked) return;
+      soundBlocked = false;
+      if (unblockListener) document.removeEventListener("pointerdown", unblockListener, true);
+      unblockListener = null;
+      relevel();
+      for (const layer of [active, incoming]) {
+        const source = layer && soundOf(layer);
+        if (source && source.paused && source === layer.audio) source.play().catch(() => {});
+      }
     }
 
     function playPart(layer, el, token) {
@@ -450,13 +472,30 @@
       });
     }
 
+    function setUserVolume(value) {
+      userVolume = value;
+      if (value > 0) lastVolume = value;
+      remember(soundVolumeKey, String(value));
+    }
+
     soundToggleEl.addEventListener("click", () => {
       if (soundBlocked) {
-        soundBlocked = false;
         userMuted = false;
+        resumeSound();
       } else {
         userMuted = !userMuted;
       }
+      // Unmuting at volume 0 would still be silent: bring back the last audible level.
+      if (!userMuted && settings && baseVolume() === 0) setUserVolume(lastVolume);
+      remember(soundMutedKey, userMuted ? "1" : "0");
+      relevel();
+    });
+
+    soundVolumeEl.addEventListener("input", () => {
+      const value = Math.min(1, Math.max(0, Number(soundVolumeEl.value) / 100 || 0));
+      setUserVolume(value);
+      // Dragging to 0 mutes; dragging up from muted unmutes, like the music player's slider.
+      userMuted = value === 0;
       remember(soundMutedKey, userMuted ? "1" : "0");
       relevel();
     });
