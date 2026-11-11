@@ -93,8 +93,8 @@ body {
 
 .sound-controls {
   position: absolute;
+  top: 32px;
   right: 64px;
-  bottom: 32px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -438,6 +438,6 @@ body {
   .rail { width: 3px; height: 1em; }
   .tip { margin-top: 12px; font-size: 12px; }
   .music { right: 24px; bottom: auto; top: 24px; width: 216px; }
-  .sound-controls { right: 24px; bottom: 16px; }
+  .sound-controls { right: 24px; top: auto; bottom: 16px; }
 }
 @media (max-height: 500px) { .content { bottom: 32px; }.tip { display: none; }.server-name { font-size: 28px; }.music { bottom: 24px; } }
