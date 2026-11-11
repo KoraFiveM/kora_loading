@@ -46,7 +46,7 @@ Config.media = {
     },
     videoSound = true,          -- play each video's own soundtrack (a row's audio always replaces it)
     videoVolume = 0.5,          -- 0..1, for video sound and row audio
-    videoSoundButton = true,    -- show a mute/unmute button while a clip can make sound
+    videoSoundButton = true,    -- show the mute button + volume slider while a clip can make sound
     videoOrder = 'shuffle',     -- 'sequential', 'shuffle' or 'random'
     videoRandomStart = false,   -- sequential only: begin at a random video instead of the first
     videoPinFirst = true,       -- the first video always plays first (once); the order applies to the rest
@@ -117,8 +117,8 @@ if Kora and Kora.config and Kora.config.adopt then
         description = 'Volume of the video soundtracks and clip audio files, from 0 (silent) to 1 (full). Applies to players who connect after saving.',
     })
     Config.media.videoSoundButton = Kora.config.boolean(Config.media.videoSoundButton, {
-        live = true, label = 'Show the mute button',
-        description = 'When enabled and a clip can make sound, a mute button is shown in the bottom-right corner. Each player\'s choice is remembered for their next connect. It is also how a player turns the sound on if their game refuses to start it automatically; clicking anywhere on the screen does that too. Applies to players who connect after saving.',
+        live = true, label = 'Show the sound controls',
+        description = 'When enabled and a clip can make sound, a mute button and volume slider are shown in the bottom-right corner. Each player\'s mute and volume are remembered for their next connect; Clip volume is the starting level until they move the slider. It is also how a player turns the sound on if their game refuses to start it automatically; clicking anywhere on the screen does that too. Applies to players who connect after saving.',
     })
     Config.media.videoOrder = Kora.config.enum(Config.media.videoOrder, {
         live = true, label = 'Video order',
