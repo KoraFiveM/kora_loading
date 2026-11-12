@@ -5,7 +5,7 @@ use_experimental_fxv2_oal 'yes'
 
 name 'kora_loading'
 author 'Jamie'
-version '0.2.0'
+version '0.2.1'
 description 'kora_theme-styled loading screen'
 
 dependency 'kora_theme'
