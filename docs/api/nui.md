@@ -1,13 +1,34 @@
 ---
-title: Events and callbacks
-sidebar_position: 7
+title: "NUI callback"
+sidebar_position: 2
 ---
 
-# Events and callbacks
+
+# NUI callback
+
+The interface this resource exposes: NUI callbacks answering the page's requests, and two shutdown triggers. The only exports are the optional FFT test hooks (see [Exports](../exports.md)). `server.lua` also hands the settings to the page while the player connects.
+
+Namespace: `client.lua` · Source: `client.lua`
+
+## Options
+
+The callback and the two events handled by `client.lua`.
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `loadingscreen:getTheme` | NUI callback | Called by the loading-screen page on load. Replies with `{ serverName, tips, showProgressText, theme, media, musicPlayer, playerTheme }`, built by `KoraLoading.payload()` from `Config` plus the player's accent colour. |
+| `QBCore:Client:OnPlayerLoaded` | net event (listened to) | Shuts down the loading screen (fallback path). |
+| `kora_multichar:client:spawnComplete` | event (listened to, fired by Kora Multichar) | Shuts down the loading screen (primary handoff from character spawn). |
+
+## Limits and related APIs
+
+Shutdown is idempotent: a `hasShutdown` flag ensures `ShutdownLoadingScreen()`/`ShutdownLoadingScreenNui()` are only called once even if both triggers fire.
+
+## Events, NUI callbacks and game messages in detail
 
 `kora_loading` registers no commands and no server-side net events.
 
-## Server
+### Server
 
 | Event | Type | Description |
 | --- | --- | --- |
@@ -15,7 +36,7 @@ sidebar_position: 7
 
 The payload contains `serverName`, `tips`, `showProgressText`, `theme`, `media` and `musicPlayer`.
 
-## Client events handled
+### Client events handled
 
 | Event | Type | Description |
 | --- | --- | --- |
@@ -25,7 +46,7 @@ The payload contains `serverName`, `tips`, `showProgressText`, `theme`, `media` 
 
 Dismissal runs once: it calls `ShutdownLoadingScreen()` and `ShutdownLoadingScreenNui()`. With `loadscreen_manual_shutdown` on, nothing else in this resource dismisses the screen, so a server that fires neither event needs another resource to do it.
 
-## NUI callbacks
+### NUI callbacks
 
 | Callback | Called by | Response |
 | --- | --- | --- |
@@ -34,6 +55,6 @@ Dismissal runs once: it calls `ShutdownLoadingScreen()` and `ShutdownLoadingScre
 
 The client calls the `getPlayerTheme` export of `kora_theme` inside `pcall`, so a missing `kora_theme` yields `false` rather than an error.
 
-## Game messages the page reads
+### Game messages the page reads
 
-`loadProgress`, `startInitFunctionOrder`, `initFunctionInvoking`, `startDataFileEntries`, `performMapLoadFunction` and `endDataFileEntries` are FiveM loadscreen messages. See [Features](./features.md).
+`loadProgress`, `startInitFunctionOrder`, `initFunctionInvoking`, `startDataFileEntries`, `performMapLoadFunction` and `endDataFileEntries` are FiveM loadscreen messages. See [Features](../features.md).
