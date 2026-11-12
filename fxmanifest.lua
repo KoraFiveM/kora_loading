@@ -1,0 +1,51 @@
+fx_version 'cerulean'
+game 'gta5'
+lua54 'yes'
+use_experimental_fxv2_oal 'yes'
+
+name 'kora_loading'
+author 'Jamie'
+version '0.2.1'
+description 'kora_theme-styled loading screen'
+
+dependency 'kora_theme'
+dependency 'kora_lib'
+
+loadscreen 'html/index.html'
+loadscreen_manual_shutdown 'yes'
+-- A loadscreen gets no keyboard focus, so the music player's controls are
+-- reachable only with the mouse. This is what puts a cursor on the screen;
+-- without it the player still shows what is playing but cannot be clicked.
+loadscreen_cursor 'yes'
+
+-- Hidden in-game page that keeps the loading screen's cached player colour in step with /theme.
+ui_page 'html/sync.html'
+
+files {
+    'html/sync.html',
+    'html/sync.js',
+    'html/index.html',
+    'html/style.css',
+    'html/app.js',
+    -- Synced copies of kora_theme's theme.js, theme.json and fonts/ folder, so
+    -- colours and fonts apply before the cfx-nui-kora_theme origin answers.
+    -- Refresh with tools/sync-theme.mjs, never by hand.
+    'html/kora_theme/**',
+    'html/media/*',
+}
+
+-- Required to reach shared kora_lib APIs -- see kora_lib's own AGENTS.md for why this
+-- is how a consumer resource pulls in the Kora proxy (init.lua).
+shared_script '@kora_lib/init.lua'
+
+shared_scripts { 'config.lua', 'payload.lua' }
+-- Hands the settings to the loading page while the player connects (window.nuiHandoverData).
+server_script 'server.lua'
+client_scripts {
+    'client.lua',
+    -- Optional FFT hooks: returns immediately unless fft_kora_hooks is true.
+    'fft_hooks.lua'
+}
+
+-- kora_qa: Gherkin test scenarios (converted legacy tests), see [kora]/kora_qa/README.md
+qa_feature 'tests/*.feature'
