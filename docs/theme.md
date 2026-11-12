@@ -1,6 +1,6 @@
 ---
 title: Theme
-sidebar_position: 6
+sidebar_position: 8
 ---
 
 # Theme
@@ -31,7 +31,7 @@ The player's own accent colour is stored by `kora_theme`, which only the client 
 2. It saves a `#RRGGBB` value to `localStorage` under `kora_loading:playerTheme`, or removes it when the player has no custom colour.
 3. The next loading screen reads that value on its first paint.
 
-`client.lua` forwards `kora_theme:playerThemeChanged` as the `kora_loading:playerTheme` message. See [Events](./events.md).
+`client.lua` forwards `kora_theme:playerThemeChanged` as the `kora_loading:playerTheme` message. See [Events](./api/nui.md).
 
 ## Cache busting
 

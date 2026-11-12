@@ -1,6 +1,6 @@
 ---
 title: Media
-sidebar_position: 5
+sidebar_position: 7
 ---
 
 # Media
@@ -39,7 +39,7 @@ videos = {
 | `audio` | Replaces the clip's sound. mp3, ogg, wav, flac or webm. |
 | `seconds` | Clip length. Default is the video's length, the audio's length for an image with audio, or `slideSeconds` for a silent image. A shorter video loops until the time is up. |
 
-A row with neither `video` nor `image` is skipped with a console warning. A clip that fails to load is dropped for the rest of the screen. If none load, the themed background shows. Settings are described in [Configuration](./configuration.md).
+A row with neither `video` nor `image` is skipped with a console warning. A clip that fails to load is dropped for the rest of the screen. If none load, the themed background shows. Settings are described in [Configuration](./api/configuration.md).
 
 ### Ordering
 

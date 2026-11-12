@@ -9,14 +9,16 @@ sidebar_position: 1
 
 Current version: see `version` in `fxmanifest.lua`.
 
-## Pages
+## Documentation map
 
-- [Installation](./installation.md) - dependencies, start order and the manifest settings that matter.
+- [Installation](./installation.md) - install steps, dependencies, start order and the manifest settings that matter.
+- [How to use](./how-to-use.md) - how the page gets its settings, manual shutdown and handoff, theming, background and music.
+- [API reference](./api/index.md) - the interfaces and settings of the resource.
+  - [NUI callback](./api/nui.md) - NUI callbacks, handled events, the connect-time handover and shutdown.
+  - [Configuration reference](./api/configuration.md) - every `Config` option with defaults, ranges and live options.
 - [Features](./features.md) - what the loading screen does and how it behaves.
-- [Configuration](./configuration.md) - every `Config` option with defaults.
 - [Media](./media.md) - wallpapers, background clip playlist and the music player in detail.
 - [Theme](./theme.md) - colours, fonts and the synced `kora_theme` copy.
-- [Events and callbacks](./events.md) - handover, NUI callbacks, game events and the dismissal triggers.
 - [Exports](./exports.md) - the optional FFT test hooks.
 - [Troubleshooting](./troubleshooting.md) - common problems and fixes.
 

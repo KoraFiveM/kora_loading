@@ -1,6 +1,6 @@
 ---
 title: Features
-sidebar_position: 3
+sidebar_position: 6
 ---
 
 # Features
@@ -46,8 +46,8 @@ If the player picked their own accent colour in kora_theme, the next loading scr
 
 ## Built-in fallback
 
-If the page has no handover data after about 300 ms, it applies built-in defaults (the default tips, wallpaper and clip list, but no server name and no music player) and keeps asking the client script for the real settings. See [Events](./events.md).
+If the page has no handover data after about 300 ms, it applies built-in defaults (the default tips, wallpaper and clip list, but no server name and no music player) and keeps asking the client script for the real settings. See [Events](./api/nui.md).
 
 ## Dismissal
 
-The screen is dismissed when `QBCore:Client:OnPlayerLoaded` or `kora_multichar:client:spawnComplete` fires on the client. See [Events](./events.md).
+The screen is dismissed when `QBCore:Client:OnPlayerLoaded` or `kora_multichar:client:spawnComplete` fires on the client. See [Events](./api/nui.md).

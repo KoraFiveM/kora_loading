@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 9
+sidebar_position: 10
 ---
 
 # Troubleshooting
@@ -15,7 +15,7 @@ The page received no handover data and no answer from `loadingscreen:getTheme`. 
 
 ## Config change not visible
 
-Only options marked live in [Configuration](./configuration.md) apply to new connections without a restart. Restart `kora_loading` for the rest. Screens already open are not refreshed.
+Only options marked live in [Configuration](./api/configuration.md) apply to new connections without a restart. Restart `kora_loading` for the rest. Screens already open are not refreshed.
 
 ## A video or track does not play
 
