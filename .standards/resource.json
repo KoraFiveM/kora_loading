@@ -1,0 +1,44 @@
+{
+  "resource": "kora_loading",
+  "standardsRevision": "2026-11-12.2",
+  "realms": {
+    "client": [
+      "client.lua",
+      "fft_hooks.lua"
+    ],
+    "server": [
+      "server.lua"
+    ],
+    "shared": [
+      "config.lua",
+      "payload.lua"
+    ],
+    "manifest": [
+      "fxmanifest.lua"
+    ],
+    "test": []
+  },
+  "exclude": [
+    ".git/*",
+    ".github/*",
+    ".standards/*",
+    "node_modules/*",
+    "**/node_modules/*",
+    "vendor/*",
+    "**/vendor/*",
+    "web/*",
+    "ui/*",
+    "html/*",
+    "dist/*",
+    "artifacts/*",
+    "runtime/*",
+    "txData/*",
+    "storage/*",
+    "stream/*",
+    "docs/*",
+    "__pycache__/*",
+    "modules/lookup/data/*"
+  ],
+  "project": "Kora Framework",
+  "copyright": "Copyright © 2026 Kora Framework"
+}
