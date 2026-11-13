@@ -31,5 +31,25 @@ function KoraLoading.payload()
         theme = plainCopy(Config.theme),
         media = media,
         musicPlayer = player,
+        locale = {
+            loading = Kora.lang('Ui.loading'),
+            fallback_server_name = Kora.lang('Ui.server_name'),
+            now_playing = Kora.lang('Ui.now_playing'),
+            pause = Kora.lang('Ui.pause'),
+            play = Kora.lang('Ui.play'),
+            next_track = Kora.lang('Ui.next_track'),
+            mute = Kora.lang('Ui.mute'),
+            unmute = Kora.lang('Ui.unmute'),
+            volume = Kora.lang('Ui.volume'),
+            video_volume = Kora.lang('Ui.video_volume'),
+            play_to_start_music = Kora.lang('Ui.play_to_start_music'),
+            progress = {
+                starting_game = Kora.lang('Progress.starting_game'),
+                preparing_world = Kora.lang('Progress.preparing_world'),
+                loading_map = Kora.lang('Progress.loading_map'),
+                finishing_map = Kora.lang('Progress.finishing_map'),
+                joining_session = Kora.lang('Progress.joining_session'),
+            },
+        },
     }
 end

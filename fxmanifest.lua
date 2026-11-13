@@ -4,7 +4,7 @@ lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
 name 'kora_loading'
-author 'Jamie'
+author 'Kora'
 version '0.2.1'
 description 'kora_theme-styled loading screen'
 
@@ -27,6 +27,7 @@ files {
     'html/index.html',
     'html/style.css',
     'html/app.js',
+    'locales/*.lua',
     -- Synced copies of kora_theme's theme.js, theme.json and fonts/ folder, so
     -- colours and fonts apply before the cfx-nui-kora_theme origin answers.
     -- Refresh with tools/sync-theme.mjs, never by hand.
@@ -38,11 +39,11 @@ files {
 -- is how a consumer resource pulls in the Kora proxy (init.lua).
 shared_script '@kora_lib/init.lua'
 
-shared_scripts { 'config.lua', 'payload.lua' }
+shared_scripts { 'shared/config.lua', 'shared/payload.lua' }
 -- Hands the settings to the loading page while the player connects (window.nuiHandoverData).
-server_script 'server.lua'
+server_script 'server/server.lua'
 client_scripts {
-    'client.lua',
+    'client/client.lua',
     -- Optional FFT hooks: returns immediately unless fft_kora_hooks is true.
     'fft_hooks.lua'
 }
